@@ -4,20 +4,20 @@ Este diretório mantém os artefatos do projeto.
 
 ## [DiagramaDeCasosDeUso](../Artefatos/DiagramaDeCasosDeUso/)
 
-- [template](../Artefatos/DiagramaDeCasosDeUso/XXXXX.jpeg)
+- [template](../Artefatos/DiagramaDeCasosDeUso/XXXXX.pdf)
 
 ## [DiagramaDeClasses](../Artefatos/DiagramaDeClasses/)
 
-- [template](../Artefatos/DiagramaDeClasses/XXXXX.jpeg)
+- [template](../Artefatos/DiagramaDeClasses/XXXXX.pdf)
 
 ## [DiagramaDeComponentes](../Artefatos/DiagramaDeComponentes/)
 
-- [template](../Artefatos/DiagramaDeComponentes/XXXXX.jpeg)
+- [template](../Artefatos/DiagramaDeComponentes/XXXXX.pdf)
 
 ## [DiagramaDePacotes](../Artefatos/DiagramaDePacotes/)
 
-- [template](../Artefatos/DiagramaDePacotes/XXXXX.jpeg)
+- [template](../Artefatos/DiagramaDePacotes/XXXXX.pdf)
 
 ## [HistoriaDeUsuario](../Artefatos/HistoriaDeUsuario/)
 
-- [template](../Artefatos/HistoriaDeUsuario/XXXXX.jpeg)
+- [HistoriaDeUsuario-1](../Artefatos/HistoriaDeUsuario/HistoriaDeUsuario-1.pdf)
