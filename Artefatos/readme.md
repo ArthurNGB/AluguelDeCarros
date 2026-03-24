@@ -16,7 +16,7 @@ Este diretório mantém os artefatos do projeto.
 
 ## [DiagramaDePacotes](../Artefatos/DiagramaDePacotes/)
 
-- [template](../Artefatos/DiagramaDePacotes/XXXXX.pdf)
+- [Diagrama de Pacotes](../Artefatos/DiagramaDePacotes/pacotes.jpeg)
 
 ## [HistoriaDeUsuario](../Artefatos/HistoriaDeUsuario/)
 
