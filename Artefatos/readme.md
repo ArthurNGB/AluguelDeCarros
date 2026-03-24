@@ -8,7 +8,7 @@ Este diretório mantém os artefatos do projeto.
 
 ## [DiagramaDeClasses](../Artefatos/DiagramaDeClasses/)
 
-- [Diagrama de classes](../Artefatos/DiagramaDeClasses/diagrama-classes.png)
+- [template](../Artefatos/DiagramaDeClasses/XXXXX.pdf)
 
 ## [DiagramaDeComponentes](../Artefatos/DiagramaDeComponentes/)
 
