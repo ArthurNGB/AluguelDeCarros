@@ -4,11 +4,11 @@ Este diretório mantém os artefatos do projeto.
 
 ## [DiagramaDeCasosDeUso](../Artefatos/DiagramaDeCasosDeUso/)
 
-- [template](../Artefatos/DiagramaDeCasosDeUso/XXXXX.pdf)
+- [Diagrama de Casos de Uso](../Artefatos/DiagramaDeCasosDeUso/DiagramaCasosdeUso.png)
 
 ## [DiagramaDeClasses](../Artefatos/DiagramaDeClasses/)
 
-- [template](../Artefatos/DiagramaDeClasses/XXXXX.pdf)
+- [Diagrama de Classes](../Artefatos/DiagramaDeClasses/diagrama-classes.png)
 
 ## [DiagramaDeComponentes](../Artefatos/DiagramaDeComponentes/)
 
@@ -20,4 +20,4 @@ Este diretório mantém os artefatos do projeto.
 
 ## [HistoriaDeUsuario](../Artefatos/HistoriaDeUsuario/)
 
-- [HistoriaDeUsuario-1](../Artefatos/HistoriaDeUsuario/HistoriaDeUsuario.pdf)
+- [Historia do Usuario-1](../Artefatos/HistoriaDeUsuario/HistoriaDeUsuario.pdf)
