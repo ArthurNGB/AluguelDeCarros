@@ -1,0 +1,14 @@
+package br.com.alugueldecarros.domain.model;
+
+public enum StatusPedido {
+    SUBMETIDO,
+    AGUARDANDO_CREDITO,
+    APROVADO,
+    CREDITO_APROVADO,
+    REJEITADO,
+    CANCELADO,
+    CONTRATADO,
+    PRORROGACAO_SOLICITADA,
+    PRORROGACAO_APROVADA,
+    PRORROGACAO_REJEITADA
+}
