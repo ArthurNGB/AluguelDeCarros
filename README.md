@@ -1,7 +1,5 @@
 # Aluguel De Carros
 
-Backend do **Lab02S02 - Sistema de Aluguel de Carros** desenvolvido com **Java + Quarkus**.
-
 ## Arquitetura
 
 O projeto foi organizado em camadas:
