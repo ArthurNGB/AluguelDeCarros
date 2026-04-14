@@ -89,7 +89,12 @@ public class PedidoService {
         buscarCliente(clienteId);
         PedidoAluguel pedido = buscarPedidoDoCliente(clienteId, pedidoId);
 
+<<<<<<< HEAD
+        if (pedido.getStatus() == StatusPedido.CONTRATADO
+                || pedido.getStatus() == StatusPedido.FINALIZADO) {
+=======
         if (pedido.getStatus() == StatusPedido.CONTRATADO) {
+>>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
             throw new BusinessException("Nao e possivel cancelar um pedido que ja gerou contrato.");
         }
 
@@ -161,7 +166,12 @@ public class PedidoService {
     private void validarEdicaoPermitida(PedidoAluguel pedido) {
         if (pedido.getStatus() == StatusPedido.CANCELADO
                 || pedido.getStatus() == StatusPedido.REJEITADO
+<<<<<<< HEAD
+                || pedido.getStatus() == StatusPedido.CONTRATADO
+                || pedido.getStatus() == StatusPedido.FINALIZADO) {
+=======
                 || pedido.getStatus() == StatusPedido.CONTRATADO) {
+>>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
             throw new BusinessException("O pedido nao pode mais ser alterado.");
         }
     }

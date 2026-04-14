@@ -119,6 +119,16 @@ public class ContratoService {
 
         automovel.setStatus(StatusAutomovel.DISPONIVEL);
         automovelRepository.save(automovel);
+<<<<<<< HEAD
+
+        PedidoAluguel pedido = pedidoRepository.findById(contrato.getPedidoId())
+                .orElseThrow(() -> new NotFoundException("Pedido nao encontrado."));
+        pedido.setStatus(StatusPedido.FINALIZADO);
+        pedidoRepository.save(pedido);
+        notificacaoService.notificarMudancaStatus(pedido, pedido.getStatus().name());
+
+=======
+>>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
         return contrato;
     }
 

@@ -362,7 +362,14 @@ public class AppResource {
             return clienteId;
         }
         if (clienteIdCookie != null && clienteIdCookie.matches("\\d+")) {
+<<<<<<< HEAD
+            long idDoCookie = Long.parseLong(clienteIdCookie);
+            if (usuarioRepository.findClienteById(idDoCookie).isPresent()) {
+                return idDoCookie;
+            }
+=======
             return Long.parseLong(clienteIdCookie);
+>>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
         }
         return CLIENTE_PADRAO;
     }
@@ -737,6 +744,10 @@ public class AppResource {
                 case PRORROGACAO_SOLICITADA -> "Prorrogacao em analise";
                 case PRORROGACAO_APROVADA -> "Prorrogacao aprovada";
                 case PRORROGACAO_REJEITADA -> "Prorrogacao rejeitada";
+<<<<<<< HEAD
+                case FINALIZADO -> "Finalizado";
+=======
+>>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
             };
         }
 
@@ -758,7 +769,11 @@ public class AppResource {
 
         public String badgeClasse(StatusPedido statusPedido) {
             return switch (statusPedido) {
+<<<<<<< HEAD
+                case APROVADO, CREDITO_APROVADO, CONTRATADO, PRORROGACAO_APROVADA, FINALIZADO -> "ok";
+=======
                 case APROVADO, CREDITO_APROVADO, CONTRATADO, PRORROGACAO_APROVADA -> "ok";
+>>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
                 case REJEITADO, CANCELADO, PRORROGACAO_REJEITADA -> "warn";
                 default -> "info";
             };
@@ -814,5 +829,54 @@ public class AppResource {
         public String slugStatus(StatusPedido statusPedido) {
             return statusPedido.name().toLowerCase(Locale.ROOT);
         }
+<<<<<<< HEAD
+
+        public String classeWsPending(int count) {
+            return count > 0 ? "ws-pending" : "";
+        }
+
+        public boolean podeCancelar(StatusPedido status) {
+            return status == StatusPedido.SUBMETIDO
+                    || status == StatusPedido.AGUARDANDO_CREDITO
+                    || status == StatusPedido.APROVADO
+                    || status == StatusPedido.CREDITO_APROVADO;
+        }
+
+        public int passoStatus(StatusPedido status) {
+            return switch (status) {
+                case SUBMETIDO -> 1;
+                case AGUARDANDO_CREDITO, PRORROGACAO_SOLICITADA -> 2;
+                case APROVADO, CREDITO_APROVADO, PRORROGACAO_APROVADA -> 3;
+                case CONTRATADO -> 4;
+                case FINALIZADO -> 5;
+                case REJEITADO, CANCELADO, PRORROGACAO_REJEITADA -> 0;
+            };
+        }
+
+        public String classeStep(StatusPedido status, int step) {
+            int passo = passoStatus(status);
+            if (passo == 0) {
+                if (step == 1) return "track-step done";
+                if (step == 2) return "track-step ended";
+                return "track-step";
+            }
+            if (step < passo) return "track-step done";
+            if (step == passo) return "track-step active";
+            return "track-step";
+        }
+
+        public boolean temPedidosCliente() {
+            return !pedidosCliente.isEmpty();
+        }
+
+        public boolean temPedidosEditaveis() {
+            return !pedidosEditaveis().isEmpty();
+        }
+
+        public boolean temContratosClienteAtivos() {
+            return !contratosClienteAtivos().isEmpty();
+        }
+=======
+>>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
     }
 }

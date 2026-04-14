@@ -5,8 +5,15 @@ import br.com.alugueldecarros.domain.exception.BusinessException;
 import br.com.alugueldecarros.domain.exception.NotFoundException;
 import br.com.alugueldecarros.domain.model.Automovel;
 import br.com.alugueldecarros.domain.model.StatusAutomovel;
+<<<<<<< HEAD
+import br.com.alugueldecarros.domain.model.StatusPedido;
 import br.com.alugueldecarros.domain.repository.AutomovelRepository;
 import br.com.alugueldecarros.domain.repository.ContratoRepository;
+import br.com.alugueldecarros.domain.repository.PedidoAluguelRepository;
+=======
+import br.com.alugueldecarros.domain.repository.AutomovelRepository;
+import br.com.alugueldecarros.domain.repository.ContratoRepository;
+>>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -22,6 +29,12 @@ public class FrotaService {
     @Inject
     ContratoRepository contratoRepository;
 
+<<<<<<< HEAD
+    @Inject
+    PedidoAluguelRepository pedidoRepository;
+
+=======
+>>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
     public Automovel cadastrar(Long proprietarioId, CatalogoDtos.CriarAutomovelRequest request) {
         validarDuplicidade(request.matricula(), request.placa(), null);
 
@@ -54,8 +67,24 @@ public class FrotaService {
     public void remover(Long automovelId) {
         contratoRepository.findActiveByAutomovelId(automovelId)
                 .ifPresent(contrato -> {
+<<<<<<< HEAD
+                    throw new BusinessException("Nao e possivel remover um veiculo com contrato ativo em andamento.");
+                });
+
+        boolean temPedidoPendente = pedidoRepository.listAll().stream()
+                .filter(p -> automovelId.equals(p.getAutomovelId()))
+                .anyMatch(p -> p.getStatus() != StatusPedido.CANCELADO
+                        && p.getStatus() != StatusPedido.REJEITADO
+                        && p.getStatus() != StatusPedido.CONTRATADO
+                        && p.getStatus() != StatusPedido.PRORROGACAO_REJEITADA);
+        if (temPedidoPendente) {
+            throw new BusinessException("Nao e possivel remover um veiculo com pedidos de aluguel em andamento. Cancele ou finalize os pedidos antes.");
+        }
+
+=======
                     throw new BusinessException("Nao e possivel excluir um automovel vinculado a contrato ativo.");
                 });
+>>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
         buscarPorId(automovelId);
         automovelRepository.deleteById(automovelId);
     }

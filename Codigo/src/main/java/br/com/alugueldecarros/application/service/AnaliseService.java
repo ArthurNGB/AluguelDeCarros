@@ -45,7 +45,13 @@ public class AnaliseService {
         PedidoAluguel pedido = pedidoRepository.findById(request.pedidoId())
                 .orElseThrow(() -> new NotFoundException("Pedido nao encontrado."));
 
+<<<<<<< HEAD
+        if (pedido.getStatus() == StatusPedido.CANCELADO
+                || pedido.getStatus() == StatusPedido.CONTRATADO
+                || pedido.getStatus() == StatusPedido.FINALIZADO) {
+=======
         if (pedido.getStatus() == StatusPedido.CANCELADO || pedido.getStatus() == StatusPedido.CONTRATADO) {
+>>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
             throw new BusinessException("Nao e possivel avaliar este pedido.");
         }
 
@@ -163,6 +169,10 @@ public class AnaliseService {
         return statusPedido == StatusPedido.APROVADO
                 || statusPedido == StatusPedido.CREDITO_APROVADO
                 || statusPedido == StatusPedido.CONTRATADO
+<<<<<<< HEAD
+                || statusPedido == StatusPedido.FINALIZADO
+=======
+>>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
                 || statusPedido == StatusPedido.PRORROGACAO_APROVADA;
     }
 
