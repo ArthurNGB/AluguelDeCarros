@@ -20,4 +20,4 @@ Este diretório mantém os artefatos do projeto.
 
 ## [HistoriaDeUsuario](../Artefatos/HistoriaDeUsuario/)
 
-- [Historia do Usuario-1](../Artefatos/HistoriaDeUsuario/HistoriaDeUsuario.pdf)
+- [Historia do Usuario-1](../Artefatos/HistoriaDeUsuario/HistoriaDeUsuario-2.pdf)
