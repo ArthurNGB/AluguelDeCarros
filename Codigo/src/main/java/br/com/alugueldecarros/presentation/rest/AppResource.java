@@ -37,14 +37,22 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.resteasy.reactive.RestForm;
+import org.jboss.resteasy.reactive.multipart.FileUpload;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 @Path("/app")
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -53,6 +61,11 @@ public class AppResource {
 
     private static final long CLIENTE_PADRAO = 3L;
     private static final String COOKIE_CLIENTE_ATUAL = "clienteAtualId";
+    private static final long TAMANHO_MAXIMO_IMAGEM = 5 * 1024 * 1024;
+    private static final Set<String> EXTENSOES_IMAGEM_PERMITIDAS = Set.of("jpg", "jpeg", "png", "webp");
+
+    @ConfigProperty(name = "aluguel.upload.veiculos-dir", defaultValue = "uploads/veiculos")
+    String diretorioUploadVeiculos;
 
     @Inject
     UsuarioRepository usuarioRepository;
@@ -282,19 +295,31 @@ public class AppResource {
 
     @POST
     @Path("/frota/cadastrar")
-    public Response cadastrarAutomovel(@BeanParam AutomovelCreateForm form) {
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response cadastrarAutomovel(
+            @RestForm("clienteId") Long clienteId,
+            @RestForm("empresaId") Long empresaId,
+            @RestForm("matricula") String matricula,
+            @RestForm("ano") Integer ano,
+            @RestForm("marca") String marca,
+            @RestForm("modelo") String modelo,
+            @RestForm("placa") String placa,
+            @RestForm("valorDiaria") BigDecimal valorDiaria,
+            @RestForm("imagem") FileUpload imagem
+    ) {
         try {
-            catalogoFacade.cadastrar(form.empresaId, new CatalogoDtos.CriarAutomovelRequest(
-                    form.matricula,
-                    form.ano,
-                    form.marca,
-                    form.modelo,
-                    form.placa,
-                    form.valorDiaria
+            CatalogoDtos.AutomovelResponse automovel = catalogoFacade.cadastrar(empresaId, new CatalogoDtos.CriarAutomovelRequest(
+                    matricula,
+                    ano,
+                    marca,
+                    modelo,
+                    placa,
+                    valorDiaria
             ));
-            return redirectComMensagem(form.clienteId, "Automovel cadastrado.", null);
+            salvarImagemSeRecebida(automovel.id(), imagem);
+            return redirectComMensagem(clienteId, "Automovel cadastrado.", null);
         } catch (Exception exception) {
-            return redirectComMensagem(form.clienteId, null, extrairMensagem(exception));
+            return redirectComMensagem(clienteId, null, extrairMensagem(exception));
         }
     }
 
@@ -318,6 +343,23 @@ public class AppResource {
     }
 
     @POST
+    @Path("/frota/imagem")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response atualizarImagemAutomovel(
+            @RestForm("clienteId") Long clienteId,
+            @RestForm("automovelId") Long automovelId,
+            @RestForm("imagem") FileUpload imagem
+    ) {
+        try {
+            validarAutomovelExistente(automovelId);
+            salvarImagemObrigatoria(automovelId, imagem);
+            return redirectComMensagem(clienteId, "Imagem do veiculo atualizada.", null);
+        } catch (Exception exception) {
+            return redirectComMensagem(clienteId, null, extrairMensagem(exception));
+        }
+    }
+
+    @POST
     @Path("/frota/remover")
     public Response removerAutomovel(@BeanParam AutomovelRemoveForm form) {
         try {
@@ -326,6 +368,79 @@ public class AppResource {
         } catch (Exception exception) {
             return redirectComMensagem(form.clienteId, null, extrairMensagem(exception));
         }
+    }
+
+    private void validarAutomovelExistente(Long automovelId) {
+        if (automovelId == null) {
+            throw new IllegalArgumentException("Veiculo nao informado.");
+        }
+        boolean existe = catalogoFacade.listarTodos().stream()
+                .anyMatch(automovel -> automovel.id().equals(automovelId));
+        if (!existe) {
+            throw new IllegalArgumentException("Veiculo nao encontrado.");
+        }
+    }
+
+    private void salvarImagemObrigatoria(Long automovelId, FileUpload imagem) throws IOException {
+        if (!imagemRecebida(imagem)) {
+            throw new IllegalArgumentException("Selecione uma imagem para o veiculo.");
+        }
+        salvarImagem(automovelId, imagem);
+    }
+
+    private void salvarImagemSeRecebida(Long automovelId, FileUpload imagem) throws IOException {
+        if (imagemRecebida(imagem)) {
+            salvarImagem(automovelId, imagem);
+        }
+    }
+
+    private boolean imagemRecebida(FileUpload imagem) {
+        return imagem != null
+                && imagem.uploadedFile() != null
+                && Files.exists(imagem.uploadedFile())
+                && imagem.fileName() != null
+                && !imagem.fileName().isBlank();
+    }
+
+    private void salvarImagem(Long automovelId, FileUpload imagem) throws IOException {
+        long tamanho = Files.size(imagem.uploadedFile());
+        if (tamanho <= 0) {
+            throw new IllegalArgumentException("A imagem enviada esta vazia.");
+        }
+        if (tamanho > TAMANHO_MAXIMO_IMAGEM) {
+            throw new IllegalArgumentException("A imagem deve ter no maximo 5 MB.");
+        }
+
+        String extensao = extensaoImagem(imagem.fileName());
+        java.nio.file.Path diretorio = Paths.get(diretorioUploadVeiculos).toAbsolutePath().normalize();
+        Files.createDirectories(diretorio);
+
+        String prefixoArquivo = "id-" + automovelId + ".";
+        try (DirectoryStream<java.nio.file.Path> arquivosAntigos = Files.newDirectoryStream(diretorio, prefixoArquivo + "*")) {
+            for (java.nio.file.Path arquivoAntigo : arquivosAntigos) {
+                Files.deleteIfExists(arquivoAntigo);
+            }
+        }
+
+        java.nio.file.Path destino = diretorio.resolve(prefixoArquivo + extensao).normalize();
+        if (!destino.startsWith(diretorio)) {
+            throw new IllegalArgumentException("Nome de arquivo invalido.");
+        }
+
+        Files.copy(imagem.uploadedFile(), destino, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    private String extensaoImagem(String nomeArquivo) {
+        int ponto = nomeArquivo.lastIndexOf('.');
+        if (ponto < 0 || ponto == nomeArquivo.length() - 1) {
+            throw new IllegalArgumentException("Use imagem JPG, PNG ou WEBP.");
+        }
+
+        String extensao = nomeArquivo.substring(ponto + 1).toLowerCase(Locale.ROOT);
+        if (!EXTENSOES_IMAGEM_PERMITIDAS.contains(extensao)) {
+            throw new IllegalArgumentException("Use imagem JPG, PNG ou WEBP.");
+        }
+        return extensao;
     }
 
     private Response redirectComMensagem(Long clienteId, String success, String error) {
@@ -362,14 +477,10 @@ public class AppResource {
             return clienteId;
         }
         if (clienteIdCookie != null && clienteIdCookie.matches("\\d+")) {
-<<<<<<< HEAD
             long idDoCookie = Long.parseLong(clienteIdCookie);
             if (usuarioRepository.findClienteById(idDoCookie).isPresent()) {
                 return idDoCookie;
             }
-=======
-            return Long.parseLong(clienteIdCookie);
->>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
         }
         return CLIENTE_PADRAO;
     }
@@ -530,6 +641,8 @@ public class AppResource {
         public String placa;
         @RestForm
         public BigDecimal valorDiaria;
+        @RestForm
+        public FileUpload imagem;
     }
 
     public static class AutomovelUpdateForm {
@@ -551,6 +664,15 @@ public class AppResource {
         public BigDecimal valorDiaria;
         @RestForm
         public String status;
+    }
+
+    public static class AutomovelImageForm {
+        @RestForm
+        public Long clienteId;
+        @RestForm
+        public Long automovelId;
+        @RestForm
+        public FileUpload imagem;
     }
 
     public static class AutomovelRemoveForm {
@@ -744,10 +866,7 @@ public class AppResource {
                 case PRORROGACAO_SOLICITADA -> "Prorrogacao em analise";
                 case PRORROGACAO_APROVADA -> "Prorrogacao aprovada";
                 case PRORROGACAO_REJEITADA -> "Prorrogacao rejeitada";
-<<<<<<< HEAD
-                case FINALIZADO -> "Finalizado";
-=======
->>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
+                default -> "Finalizado";
             };
         }
 
@@ -769,13 +888,9 @@ public class AppResource {
 
         public String badgeClasse(StatusPedido statusPedido) {
             return switch (statusPedido) {
-<<<<<<< HEAD
-                case APROVADO, CREDITO_APROVADO, CONTRATADO, PRORROGACAO_APROVADA, FINALIZADO -> "ok";
-=======
                 case APROVADO, CREDITO_APROVADO, CONTRATADO, PRORROGACAO_APROVADA -> "ok";
->>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
                 case REJEITADO, CANCELADO, PRORROGACAO_REJEITADA -> "warn";
-                default -> "info";
+                default -> "FINALIZADO".equals(statusPedido.name()) ? "ok" : "info";
             };
         }
 
@@ -829,7 +944,6 @@ public class AppResource {
         public String slugStatus(StatusPedido statusPedido) {
             return statusPedido.name().toLowerCase(Locale.ROOT);
         }
-<<<<<<< HEAD
 
         public String classeWsPending(int count) {
             return count > 0 ? "ws-pending" : "";
@@ -848,8 +962,8 @@ public class AppResource {
                 case AGUARDANDO_CREDITO, PRORROGACAO_SOLICITADA -> 2;
                 case APROVADO, CREDITO_APROVADO, PRORROGACAO_APROVADA -> 3;
                 case CONTRATADO -> 4;
-                case FINALIZADO -> 5;
                 case REJEITADO, CANCELADO, PRORROGACAO_REJEITADA -> 0;
+                default -> "FINALIZADO".equals(status.name()) ? 5 : 0;
             };
         }
 
@@ -876,7 +990,5 @@ public class AppResource {
         public boolean temContratosClienteAtivos() {
             return !contratosClienteAtivos().isEmpty();
         }
-=======
->>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
     }
 }

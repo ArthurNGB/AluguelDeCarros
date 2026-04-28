@@ -23,21 +23,26 @@ public class NotificacaoService {
 
     public void notificarMudancaStatus(PedidoAluguel pedido, String descricaoStatus) {
         Notificacao notificacao = new Notificacao();
+
         notificacao.setClienteId(pedido.getClienteId());
         notificacao.setTitulo("Status do pedido atualizado");
         notificacao.setMensagem("Pedido " + pedido.getId() + " atualizado para " + descricaoStatus + ".");
         notificacao.setDataCriacao(LocalDateTime.now());
         notificacao.setLida(false);
+
         notificacaoRepository.save(notificacao);
+
         canal(pedido.getClienteId()).onNext(notificacao);
     }
 
     public List<Notificacao> listarNaoLidas(Long clienteId) {
         List<Notificacao> notificacoes = notificacaoRepository.findNaoLidas(clienteId);
+
         notificacoes.forEach(notificacao -> {
             notificacao.setLida(true);
             notificacaoRepository.save(notificacao);
         });
+
         return notificacoes;
     }
 

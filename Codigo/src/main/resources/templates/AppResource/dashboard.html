@@ -3,1699 +3,975 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Locadora Horizonte</title>
+  <title>Locadora Horizonte | Painel</title>
   <link rel="stylesheet" href="/app/styles.css">
 </head>
 <body data-cliente-id="{view.clienteSelecionado}">
-<<<<<<< HEAD
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Navegação principal">
+      <a class="brand" href="/app?clienteId={view.clienteSelecionado}" aria-label="Locadora Horizonte">
+        <span class="brand-logo">LH</span>
+        <span>
+          <strong>Locadora</strong>
+          <small>Horizonte</small>
+        </span>
+      </a>
 
-<!-- Topbar -->
-<nav class="topbar">
-  <div class="topbar-inner">
-    <div class="topbar-brand">
-      <div class="brand-mark"></div>
-      <span class="brand-name">Locadora Horizonte</span>
-    </div>
-    <div class="topbar-right">
-      <form method="post" action="/app/selecionar" class="client-form">
-        <label class="client-label">Visualizando como:</label>
-        <select name="clienteId" onchange="this.form.submit()" class="client-select">
-          {#for cliente in view.clientes}
-            <option value="{cliente.id}" {#if view.clienteSelecionado(cliente.id)}selected{/if}>{cliente.nome} (#{cliente.id})</option>
-          {/for}
-        </select>
-      </form>
-      <span class="topbar-email">{view.emailClienteSelecionado}</span>
-    </div>
-  </div>
-</nav>
+      <nav class="side-nav">
+        <button type="button" class="nav-item is-active" data-tab-target="resumo">
+          <span class="nav-icon">⌁</span>
+          <span>Resumo</span>
+        </button>
+        <button type="button" class="nav-item" data-tab-target="catalogo">
+          <span class="nav-icon">▣</span>
+          <span>Catálogo</span>
+        </button>
+        <button type="button" class="nav-item" data-tab-target="solicitacoes">
+          <span class="nav-icon">◆</span>
+          <span>Solicitações</span>
+        </button>
+        <button type="button" class="nav-item" data-tab-target="acesso">
+          <span class="nav-icon">◉</span>
+          <span>Acesso</span>
+        </button>
+        <button type="button" class="nav-item" data-tab-target="operacional">
+          <span class="nav-icon">✦</span>
+          <span>Operacional</span>
+        </button>
+      </nav>
 
-<!-- Tab bar -->
-<div class="tabbar">
-  <div class="tabbar-inner">
-    <button class="tab active" data-panel="area">Minha Área</button>
-    <button class="tab" data-panel="catalogo">Catálogo</button>
-    <button class="tab" data-panel="acesso">Acesso</button>
-    <button class="tab" data-panel="operacional">Painel Operacional</button>
-  </div>
-</div>
-
-<!-- Alerts -->
-{#if view.success}
-  <div class="alert alert-ok" id="page-alert">{view.success}</div>
-{/if}
-{#if view.error}
-  <div class="alert alert-err" id="page-alert">{view.error}</div>
-{/if}
-
-<main class="page-wrap">
-
-  <!-- ==============================
-       ABA: MINHA ÁREA
-       ============================== -->
-  <div class="panel active" id="panel-area">
-
-    <div class="kpi-row">
-      <div class="kpi">
-        <span>Meus pedidos</span>
-        <strong>{view.pedidosClienteOrdenados.size}</strong>
-        <small>solicitações</small>
+      <div class="sidebar-card">
+        <span class="sidebar-label">Cliente ativo</span>
+        <strong>{view.nomeClienteSelecionado}</strong>
+        <small>{view.emailClienteSelecionado}</small>
       </div>
-      <div class="kpi">
-        <span>Contratos ativos</span>
-        <strong>{view.contratosClienteAtivos.size}</strong>
-        <small>em andamento</small>
-      </div>
-      <div class="kpi">
-        <span>Notificações</span>
-        <strong>{view.totalNotificacoes}</strong>
-        <small>mensagens</small>
-      </div>
-    </div>
+    </aside>
 
-    <!-- Notificações -->
-    <section class="section">
-      <div class="section-head">
+    <div class="main-area">
+      <header class="topbar">
         <div>
-          <p class="eyebrow">Central de mensagens</p>
-          <h2>Notificações</h2>
+          <p class="eyebrow">Painel de aluguel de carros</p>
+          <h1>Gestão de contratos, frota e pedidos</h1>
         </div>
-        <span class="muted">{view.totalNotificacoes} registros</span>
-      </div>
-      <div class="card">
-        <div id="toast-area" class="toast-area"></div>
-        <div id="notification-list" class="notif-list">
-          {#for n in view.notificacoes}
-            <article class="notif-item">
-              <strong>{n.titulo}</strong>
-              <p>{n.mensagem}</p>
-              <small>{n.dataCriacao}</small>
-            </article>
-          {/for}
-          {#if !view.temNotificacoes}
-            <p class="empty">Nenhuma notificação para este cliente.</p>
-          {/if}
-        </div>
-      </div>
-    </section>
 
-    <!-- Meus pedidos com rastreador de status -->
-    <section class="section">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Acompanhamento</p>
-          <h2>Meus pedidos</h2>
-        </div>
-        <span class="muted">{view.pedidosClienteOrdenados.size} registros</span>
-      </div>
-
-      {#if view.temPedidosCliente}
-        <div class="pedidos-lista">
-          {#for pedido in view.pedidosClienteOrdenados}
-            <article class="pedido-card">
-              <div class="pedido-top">
-                <div class="pedido-info">
-                  <span class="pedido-id">Pedido #<strong>{pedido.id}</strong></span>
-                  <span class="pedido-tipo">{view.rotuloTipoPedido(pedido.tipoPedido)}</span>
-                </div>
-                <span class="badge {view.badgeClasse(pedido.status)}">{view.rotuloStatusPedido(pedido.status)}</span>
-              </div>
-
-              <div class="pedido-meta">
-                <span>{view.descricaoAutomovel(pedido.automovelId)}</span>
-                <span>{pedido.dataInicio} até {pedido.dataFim}</span>
-                <strong>{view.formatarValor(pedido.valorEstimado)}</strong>
-              </div>
-
-              <!-- Rastreador visual de status -->
-              <div class="status-track">
-                <div class="{view.classeStep(pedido.status, 1)}">
-                  <div class="track-dot"></div>
-                  <span>Submetido</span>
-                </div>
-                <div class="track-line"></div>
-                <div class="{view.classeStep(pedido.status, 2)}">
-                  <div class="track-dot"></div>
-                  <span>Em análise</span>
-                </div>
-                <div class="track-line"></div>
-                <div class="{view.classeStep(pedido.status, 3)}">
-                  <div class="track-dot"></div>
-                  <span>Aprovado</span>
-                </div>
-                <div class="track-line"></div>
-                <div class="{view.classeStep(pedido.status, 4)}">
-                  <div class="track-dot"></div>
-                  <span>Contratado</span>
-                </div>
-              </div>
-
-              <!-- Cancelar só aparece para pedidos ainda canceláveis -->
-              {#if view.podeCancelar(pedido.status)}
-                <div class="pedido-actions">
-                  <form method="post" action="/app/pedidos/cancelar">
-                    <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-                    <input type="hidden" name="pedidoId" value="{pedido.id}">
-                    <button type="submit" class="btn-secondary btn-sm">Cancelar pedido</button>
-                  </form>
-                </div>
-              {/if}
-            </article>
-          {/for}
-        </div>
-      {#else}
-        <div class="card">
-          <p class="empty">Você ainda não tem pedidos. Vá até <strong>Catálogo</strong> para solicitar um aluguel.</p>
-        </div>
-      {/if}
-    </section>
-
-    <!-- Meus contratos -->
-    <section class="section">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Histórico</p>
-          <h2>Meus contratos</h2>
-        </div>
-        <span class="muted">{view.contratosCliente.size} registros</span>
-      </div>
-      <div class="card table-card">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Veículo</th>
-                <th>Status</th>
-                <th>Período</th>
-                <th>PDF</th>
-              </tr>
-            </thead>
-            <tbody>
-              {#for contrato in view.contratosCliente}
-                <tr>
-                  <td>#{contrato.id}</td>
-                  <td>{view.descricaoAutomovel(contrato.automovelId)}</td>
-                  <td>{view.rotuloStatusContrato(contrato.status)}</td>
-                  <td>{contrato.dataInicio} até {contrato.dataFim}</td>
-                  <td>
-                    {#if contrato.ativo}
-                      <a class="table-link" href="/api/contratos/{contrato.id}/pdf">Baixar PDF</a>
-                    {#else}
-                      <span class="muted">—</span>
-                    {/if}
-                  </td>
-                </tr>
-              {/for}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- Solicitar prorrogação (só aparece se há contratos ativos) -->
-    {#if view.temContratosClienteAtivos}
-      <section class="section">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Extensão de contrato</p>
-            <h2>Solicitar prorrogação</h2>
-          </div>
-        </div>
-        <div class="card">
-          <form method="post" action="/app/pedidos/prorrogacao" class="form grid-form">
-            <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-            <div class="field">
-              <label for="contratoProrrogacao">Contrato ativo</label>
-              <select id="contratoProrrogacao" name="contratoId" required>
-                {#for contrato in view.contratosClienteAtivos}
-                  <option value="{contrato.id}">Contrato #{contrato.id} — {view.descricaoAutomovel(contrato.automovelId)} — até {contrato.dataFim}</option>
-                {/for}
-              </select>
-            </div>
-            <div class="field-row">
-              <div class="field">
-                <label for="novaDataFim">Nova data final</label>
-                <input id="novaDataFim" type="date" name="novaDataFim" required>
-              </div>
-              <div class="field">
-                <label for="justificativaProrrogacao">Motivo</label>
-                <textarea id="justificativaProrrogacao" name="justificativa" rows="2" required>Preciso manter o carro por mais alguns dias.</textarea>
-              </div>
-            </div>
-            <button type="submit" class="btn-primary">Enviar solicitação</button>
-          </form>
-        </div>
-      </section>
-    {/if}
-
-    <!-- Atualizar pedido (só aparece se há pedidos editáveis) -->
-    {#if view.temPedidosEditaveis}
-      <section class="section">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Edição</p>
-            <h2>Atualizar pedido</h2>
-          </div>
-        </div>
-        <div class="card">
-          <form method="post" action="/app/pedidos/atualizar" class="form grid-form">
-            <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-            <div class="field">
-              <label for="pedidoEdicao">Pedido</label>
-              <select id="pedidoEdicao" name="pedidoId" required>
-                {#for pedido in view.pedidosEditaveis}
-                  <option value="{pedido.id}">Pedido #{pedido.id} — {view.rotuloStatusPedido(pedido.status)}</option>
-                {/for}
-              </select>
-            </div>
-            <div class="field">
-              <label for="automovelEdicao">Veículo</label>
-              <select id="automovelEdicao" name="automovelId" required>
-                {#for automovel in view.catalogoDisponivel}
-                  <option value="{automovel.id}">{automovel.marca} {automovel.modelo} — {automovel.placa}</option>
-                {/for}
-              </select>
-            </div>
-            <div class="field-row">
-              <div class="field">
-                <label for="dataInicioEdicao">Início</label>
-                <input id="dataInicioEdicao" type="date" name="dataInicio" required>
-              </div>
-              <div class="field">
-                <label for="dataFimEdicao">Fim</label>
-                <input id="dataFimEdicao" type="date" name="dataFim" required>
-              </div>
-            </div>
-            <div class="field">
-              <label for="justificativaEdicao">Justificativa</label>
-              <textarea id="justificativaEdicao" name="justificativa" rows="2" required>Ajuste de agenda</textarea>
-            </div>
-            <label class="check-label">
-              <input type="checkbox" name="requerCredito">
-              <span>Manter crédito</span>
-            </label>
-            <button type="submit" class="btn-primary">Salvar alterações</button>
-          </form>
-        </div>
-      </section>
-    {/if}
-
-  </div><!-- /panel-area -->
-
-
-  <!-- ==============================
-       ABA: CATÁLOGO
-       ============================== -->
-  <div class="panel" id="panel-catalogo">
-
-    <section class="section" id="novo-pedido">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Nova solicitação</p>
-          <h2>Criar pedido de aluguel</h2>
-        </div>
-      </div>
-      <div class="card">
-        <form method="post" action="/app/pedidos" class="form grid-form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-          <div class="field">
-            <label for="automovelId">Veículo</label>
-            <select id="automovelId" name="automovelId" required>
-              {#for automovel in view.catalogoDisponivel}
-                <option value="{automovel.id}" {#if view.automovelSelecionado(automovel.id)}selected{/if}>
-                  {automovel.marca} {automovel.modelo} — {automovel.placa} — {view.formatarValor(automovel.valorDiaria)}/dia
-                </option>
+        <form method="post" action="/app/selecionar" class="client-switcher">
+          <label for="clienteId">Visualizar como</label>
+          <div class="switcher-row">
+            <select id="clienteId" name="clienteId" onchange="this.form.submit()">
+              {#for cliente in view.clientes}
+                <option value="{cliente.id}" {#if view.clienteSelecionado(cliente.id)}selected{/if}>{cliente.nome} · #{cliente.id}</option>
               {/for}
             </select>
+            <button type="submit" class="btn btn-primary">Trocar</button>
           </div>
-          <div class="field-row">
-            <div class="field">
-              <label for="dataInicio">Início</label>
-              <input id="dataInicio" type="date" name="dataInicio" required>
-            </div>
-            <div class="field">
-=======
-<main class="page">
-  <header class="hero">
-    <div>
-      <p class="eyebrow">Locadora Horizonte</p>
-      <h1>Painel de aluguel</h1>
-      <p class="hero-text">Cliente atual: <strong>{view.nomeClienteSelecionado}</strong> | {view.emailClienteSelecionado}</p>
-    </div>
-
-    <div class="hero-side">
-      <form method="post" action="/app/selecionar" class="inline-form">
-        <label for="clienteId">Cliente</label>
-        <div class="inline-row">
-          <select id="clienteId" name="clienteId">
-            {#for cliente in view.clientes}
-              <option value="{cliente.id}" selected={view.clienteSelecionado(cliente.id)}>{cliente.nome} (ID {cliente.id})</option>
-            {/for}
-          </select>
-          <button type="submit">Trocar</button>
-        </div>
-      </form>
-      <p class="muted">Empresa: {#for agente in view.empresas}{agente.nome}{/for} | Banco: {#for agente in view.bancos}{agente.nome}{/for}</p>
-    </div>
-  </header>
-
-  {#if view.success}
-    <div class="flash success">{view.success}</div>
-  {/if}
-  {#if view.error}
-    <div class="flash error">{view.error}</div>
-  {/if}
-
-  <section class="stats">
-    <article class="stat">
-      <span>Disponiveis</span>
-      <strong>{view.totalDisponiveis}</strong>
-      <small>veiculos na frota</small>
-    </article>
-    <article class="stat">
-      <span>Pendentes do mes</span>
-      <strong>{view.totalPendentesMes}</strong>
-      <small>fila do agente</small>
-    </article>
-    <article class="stat">
-      <span>Aprovados do mes</span>
-      <strong>{view.totalAprovadosMes}</strong>
-      <small>pedidos liberados</small>
-    </article>
-    <article class="stat">
-      <span>Rejeitados do mes</span>
-      <strong>{view.totalRejeitadosMes}</strong>
-      <small>pedidos encerrados</small>
-    </article>
-    <article class="stat">
-      <span>Contratos ativos</span>
-      <strong>{view.totalContratosAtivos}</strong>
-      <small>alugueis em curso</small>
-    </article>
-  </section>
-
-  <section class="section">
-    <div class="section-title">
-      <div>
-        <p class="eyebrow">Notificacoes</p>
-        <h2>Atualizacoes do cliente</h2>
-      </div>
-      <span class="muted">{view.totalNotificacoes} registros recentes</span>
-    </div>
-
-    <div class="card">
-      <div id="toast-area" class="toast-area"></div>
-      <div id="notification-list" class="notification-list">
-        {#for notificacao in view.notificacoes}
-          <article class="notification-item">
-            <strong>{notificacao.titulo}</strong>
-            <p>{notificacao.mensagem}</p>
-            <small>{notificacao.dataCriacao}</small>
-          </article>
-        {/for}
-        {#if !view.temNotificacoes}
-          <p class="empty">Nenhuma notificacao para este cliente.</p>
-        {/if}
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-title">
-      <div>
-        <p class="eyebrow">Acesso</p>
-        <h2>Login e cadastro</h2>
-      </div>
-      <span class="muted">Cliente inicial: {view.credencialInicialCliente}</span>
-    </div>
-
-    <div class="grid two">
-      <article class="card">
-        <h3>Login</h3>
-        <form method="post" action="/app/login" class="form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-
-          <label for="loginEmail">E-mail</label>
-          <input id="loginEmail" type="email" name="email" placeholder="maria@cliente.com" autocomplete="username" required>
-
-          <label for="loginSenha">Senha</label>
-          <input id="loginSenha" type="password" name="senha" autocomplete="current-password" required>
-
-          <button type="submit">Entrar</button>
         </form>
-      </article>
+      </header>
 
-      <article class="card">
-        <h3>Novo cliente</h3>
-        <form method="post" action="/app/clientes/cadastro" class="form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-
-          <div class="grid two compact">
-            <div>
-              <label for="cadNome">Nome</label>
-              <input id="cadNome" type="text" name="nome" required>
-            </div>
-            <div>
-              <label for="cadEmail">E-mail</label>
-              <input id="cadEmail" type="email" name="email" required>
-            </div>
-          </div>
-
-          <div class="grid two compact">
-            <div>
-              <label for="cadSenha">Senha</label>
-              <input id="cadSenha" type="password" name="senha" required>
-            </div>
-            <div>
-              <label for="cadRendimento">Rendimento</label>
-              <input id="cadRendimento" type="number" step="0.01" min="0.01" name="rendimento" required>
-            </div>
-          </div>
-
-          <div class="grid two compact">
-            <div>
-              <label for="cadCpf">CPF</label>
-              <input id="cadCpf" type="text" name="cpf" inputmode="numeric" maxlength="14" pattern="[0-9.\- ]+" placeholder="12345678910" required>
-            </div>
-            <div>
-              <label for="cadRg">RG</label>
-              <input id="cadRg" type="text" name="rg" inputmode="numeric" maxlength="16" pattern="[0-9.\- ]+" placeholder="123456789" required>
-            </div>
-          </div>
-
-          <label for="cadEndereco">Endereco</label>
-          <input id="cadEndereco" type="text" name="endereco" required>
-
-          <button type="submit">Cadastrar</button>
-        </form>
-      </article>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-title">
-      <div>
-        <p class="eyebrow">Catalogo</p>
-        <h2>Veiculos disponiveis</h2>
-      </div>
-      <span class="muted">{view.resumoCatalogo}</span>
-    </div>
-
-    <div class="grid two">
-      <article class="card">
-        <h3>Filtros</h3>
-        <form method="get" action="/app" class="form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-
-          <label for="filtroMarca">Marca</label>
-          <input id="filtroMarca" type="text" name="marca" value="{view.formatarMarcaFiltro}" placeholder="Fiat, Toyota, Jeep">
-
-          <label for="filtroAno">Ano minimo</label>
-          <input id="filtroAno" type="number" name="anoMinimo" value="{view.formatarAnoMinimoFiltro}" min="2000">
-
-          <button type="submit">Aplicar filtro</button>
-        </form>
-      </article>
-
-      <article id="novo-pedido" class="card">
-        <h3>Novo pedido</h3>
-        <form method="post" action="/app/pedidos" class="form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-
-          <label for="automovelId">Automovel</label>
-          <select id="automovelId" name="automovelId" required>
-            {#for automovel in view.catalogoDisponivel}
-              <option value="{automovel.id}" selected={view.automovelSelecionado(automovel.id)}>{automovel.marca} {automovel.modelo} | {automovel.placa} | {view.formatarValor(automovel.valorDiaria)}</option>
-            {/for}
-          </select>
-
-          <div class="grid two compact">
-            <div>
-              <label for="dataInicio">Inicio</label>
-              <input id="dataInicio" type="date" name="dataInicio" required>
-            </div>
-            <div>
->>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
-              <label for="dataFim">Fim</label>
-              <input id="dataFim" type="date" name="dataFim" required>
-            </div>
-          </div>
-<<<<<<< HEAD
-          <div class="field">
-            <label for="justificativa">Justificativa</label>
-            <textarea id="justificativa" name="justificativa" rows="2" required>Viagem a trabalho</textarea>
-          </div>
-          <label class="check-label">
-            <input type="checkbox" name="requerCredito">
-            <span>Solicitar crédito junto</span>
-          </label>
-          <button type="submit" class="btn-primary">Criar pedido</button>
-        </form>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Frota disponível</p>
-          <h2>Veículos disponíveis</h2>
-        </div>
-        <span class="muted">{view.resumoCatalogo}</span>
-      </div>
-
-      <div class="card filter-card">
-        <form method="get" action="/app" class="filter-form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-          <div class="field">
-            <label for="filtroMarca">Marca</label>
-            <input id="filtroMarca" type="text" name="marca" value="{view.formatarMarcaFiltro}" placeholder="Fiat, Toyota, Jeep…">
-          </div>
-          <div class="field">
-            <label for="filtroAno">Ano mínimo</label>
-            <input id="filtroAno" type="number" name="anoMinimo" value="{view.formatarAnoMinimoFiltro}" min="2000" placeholder="2020">
-          </div>
-          <button type="submit" class="btn-primary">Filtrar</button>
-        </form>
-      </div>
-
-      <div class="catalog-grid">
-        {#for automovel in view.catalogoDisponivel}
-          <article class="vehicle-card">
-            <div class="vehicle-top">
-              <h3>{automovel.marca} {automovel.modelo}</h3>
-              <span class="badge {view.badgeClasseAutomovel(automovel.status)}">{view.rotuloStatusAutomovel(automovel.status)}</span>
-            </div>
-            <p class="muted small-text">Placa {automovel.placa} · Matrícula {automovel.matricula}</p>
-            <div class="vehicle-footer">
-              <span>Ano {automovel.ano}</span>
-              <strong>{view.formatarValor(automovel.valorDiaria)}/dia</strong>
-            </div>
-            <a class="btn-outline" href="/app?clienteId={view.clienteSelecionado}&automovelId={automovel.id}#novo-pedido">
-              Solicitar aluguel
-            </a>
-          </article>
-        {/for}
-        {#if !view.temCatalogo}
-          <div class="card full-span">
-            <p class="empty">Nenhum veículo disponível com este filtro.</p>
-          </div>
-        {/if}
-      </div>
-    </section>
-
-  </div><!-- /panel-catalogo -->
-
-
-  <!-- ==============================
-       ABA: ACESSO
-       ============================== -->
-  <div class="panel" id="panel-acesso">
-
-    <section class="section">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Autenticação</p>
-          <h2>Login e cadastro</h2>
-        </div>
-        <span class="muted">Demo: {view.credencialInicialCliente}</span>
-      </div>
-      <div class="two-col">
-        <article class="card">
-          <h3>Entrar</h3>
-          <p class="muted small-text" style="margin-bottom:14px">Após o login, a sessão é vinculada ao seu perfil automaticamente.</p>
-          <form method="post" action="/app/login" class="form">
-            <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-            <div class="field">
-              <label for="loginEmail">E-mail</label>
-              <input id="loginEmail" type="email" name="email" placeholder="maria@cliente.com" autocomplete="username" required>
-            </div>
-            <div class="field">
-              <label for="loginSenha">Senha</label>
-              <input id="loginSenha" type="password" name="senha" autocomplete="current-password" required>
-            </div>
-            <button type="submit" class="btn-primary">Entrar</button>
-          </form>
-        </article>
-
-        <article class="card">
-          <h3>Criar conta</h3>
-          <p class="muted small-text" style="margin-bottom:14px">Após o cadastro, a sessão muda automaticamente para o novo cliente.</p>
-          <form method="post" action="/app/clientes/cadastro" class="form">
-            <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-            <div class="field-row">
-              <div class="field">
-                <label for="cadNome">Nome completo</label>
-                <input id="cadNome" type="text" name="nome" required>
-              </div>
-              <div class="field">
-                <label for="cadEmail">E-mail</label>
-                <input id="cadEmail" type="email" name="email" required>
-              </div>
-            </div>
-            <div class="field-row">
-              <div class="field">
-                <label for="cadSenha">Senha</label>
-                <input id="cadSenha" type="password" name="senha" required>
-              </div>
-              <div class="field">
-                <label for="cadRendimento">Renda mensal (R$)</label>
-                <input id="cadRendimento" type="number" step="0.01" min="0.01" name="rendimento" required>
-              </div>
-            </div>
-            <div class="field-row">
-              <div class="field">
-                <label for="cadCpf">CPF</label>
-                <input id="cadCpf" type="text" name="cpf" inputmode="numeric" maxlength="14" pattern="[0-9.\- ]+" placeholder="000.000.000-00" required>
-              </div>
-              <div class="field">
-                <label for="cadRg">RG</label>
-                <input id="cadRg" type="text" name="rg" inputmode="numeric" maxlength="16" pattern="[0-9.\- ]+" placeholder="00.000.000-0" required>
-              </div>
-            </div>
-            <div class="field">
-              <label for="cadEndereco">Endereço completo</label>
-              <input id="cadEndereco" type="text" name="endereco" required>
-            </div>
-            <button type="submit" class="btn-primary">Criar conta</button>
-          </form>
-        </article>
-      </div>
-    </section>
-
-  </div><!-- /panel-acesso -->
-
-
-  <!-- ==============================
-       ABA: PAINEL OPERACIONAL
-       ============================== -->
-  <div class="panel" id="panel-operacional">
-
-    <!-- KPIs gerais -->
-    <div class="kpi-row kpi-row-5">
-      <div class="kpi">
-        <span>Veículos disponíveis</span>
-        <strong>{view.totalDisponiveis}</strong>
-        <small>na frota</small>
-      </div>
-      <div class="kpi">
-        <span>Pedidos pendentes</span>
-        <strong>{view.totalPendentesMes}</strong>
-        <small>este mês</small>
-      </div>
-      <div class="kpi">
-        <span>Aprovados</span>
-        <strong>{view.totalAprovadosMes}</strong>
-        <small>este mês</small>
-      </div>
-      <div class="kpi">
-        <span>Rejeitados</span>
-        <strong>{view.totalRejeitadosMes}</strong>
-        <small>este mês</small>
-      </div>
-      <div class="kpi">
-        <span>Contratos ativos</span>
-        <strong>{view.totalContratosAtivos}</strong>
-        <small>em curso</small>
-      </div>
-    </div>
-
-    <!-- Fluxo operacional -->
-    <div class="workflow-banner">
-      <p class="eyebrow" style="margin-bottom:8px">Fluxo de aprovação</p>
-      <div class="workflow-steps">
-        <div class="workflow-step">
-          <div class="ws-num">1</div>
-          <div class="ws-info">
-            <span>Avaliar</span>
-            {#if view.pedidosParaAvaliacao.size > 0}<small>{view.pedidosParaAvaliacao.size} aguardando</small>{/if}
-          </div>
-        </div>
-        <div class="ws-arrow">→</div>
-        <div class="workflow-step">
-          <div class="ws-num">2</div>
-          <div class="ws-info">
-            <span>Crédito</span>
-            {#if view.pedidosParaCredito.size > 0}<small>{view.pedidosParaCredito.size} aguardando</small>{/if}
-          </div>
-        </div>
-        <div class="ws-arrow">→</div>
-        <div class="workflow-step">
-          <div class="ws-num">3</div>
-          <div class="ws-info">
-            <span>Contrato</span>
-            {#if view.pedidosParaContrato.size > 0}<small>{view.pedidosParaContrato.size} prontos</small>{/if}
-          </div>
-        </div>
-        <div class="ws-arrow">→</div>
-        <div class="workflow-step">
-          <div class="ws-num">4</div>
-          <div class="ws-info">
-            <span>Devolução</span>
-            {#if view.contratosAtivos.size > 0}<small>{view.contratosAtivos.size} contratos ativos</small>{/if}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ETAPA 1: Avaliação -->
-    <section class="section">
-      <div class="section-head op-head">
-        <div>
-          <p class="eyebrow">Etapa 1 de 4</p>
-          <h2>Avaliação de pedidos</h2>
-          <p class="section-desc">A empresa analisa o pedido do cliente e aprova ou rejeita. Após aprovação, o pedido segue para concessão de crédito (se solicitado) ou vai direto para geração de contrato.</p>
-        </div>
-        <div class="op-badge-col">
-          <span class="op-count">{view.pedidosParaAvaliacao.size}</span>
-          <small>pedidos aguardando</small>
-          <span class="op-count op-count-sec">{view.prorrogacoesPendentes.size}</span>
-          <small>prorrogações aguardando</small>
-        </div>
-      </div>
-      <div class="two-col">
-        <article class="card op-card">
-          <div class="op-card-head">
-            <h3>Avaliar pedido de aluguel</h3>
-            <span class="badge info">{view.pedidosParaAvaliacao.size} na fila</span>
-          </div>
-          <p class="op-desc">Selecione um pedido de aluguel submetido pelo cliente e registre o parecer da empresa. Marque "Aprovar pedido" para avançar no fluxo.</p>
-          <form method="post" action="/app/avaliacoes" class="form op-form">
-            <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-            <div class="field">
-              <label for="empresaAnalise">Empresa avaliadora</label>
-              <select id="empresaAnalise" name="agenteId" required>
-                {#for agente in view.empresas}
-                  <option value="{agente.id}">{agente.nome}</option>
-                {/for}
-              </select>
-            </div>
-            <div class="field">
-              <label for="pedidoAvaliacao">Pedido a avaliar</label>
-              <select id="pedidoAvaliacao" name="pedidoId" required>
-                {#for pedido in view.pedidosParaAvaliacao}
-                  <option value="{pedido.id}">Pedido #{pedido.id} — {view.descricaoAutomovel(pedido.automovelId)} — cliente #{pedido.clienteId}</option>
-                {/for}
-              </select>
-            </div>
-            <div class="field">
-              <label for="parecerAvaliacao">Parecer da empresa</label>
-              <textarea id="parecerAvaliacao" name="parecer" rows="2" required>Cliente aprovado pela empresa.</textarea>
-            </div>
-            <label class="check-label">
-              <input type="checkbox" name="aprovado" checked>
-              <span>Aprovar pedido</span>
-            </label>
-            <button type="submit" class="btn-primary">Registrar avaliação</button>
-          </form>
-        </article>
-
-        <article class="card op-card">
-          <div class="op-card-head">
-            <h3>Avaliar prorrogação</h3>
-            <span class="badge info">{view.prorrogacoesPendentes.size} na fila</span>
-          </div>
-          <p class="op-desc">O cliente solicitou estender a data de devolução de um contrato ativo. Avalie a solicitação e aprove ou rejeite a extensão do prazo.</p>
-          <form method="post" action="/app/avaliacoes" class="form op-form">
-            <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-            <div class="field">
-              <label for="agenteProrrogacao">Agente avaliador</label>
-              <select id="agenteProrrogacao" name="agenteId" required>
-                {#for agente in view.empresas}
-                  <option value="{agente.id}">{agente.nome}</option>
-                {/for}
-              </select>
-            </div>
-            <div class="field">
-              <label for="pedidoProrrogacao">Solicitação de prorrogação</label>
-              <select id="pedidoProrrogacao" name="pedidoId" required>
-                {#for pedido in view.prorrogacoesPendentes}
-                  <option value="{pedido.id}">Pedido #{pedido.id} — contrato #{pedido.contratoOrigemId} — nova data: {pedido.dataFim}</option>
-                {/for}
-              </select>
-            </div>
-            <div class="field">
-              <label for="parecerProrrogacao">Parecer</label>
-              <textarea id="parecerProrrogacao" name="parecer" rows="2" required>Prorrogação analisada.</textarea>
-            </div>
-            <label class="check-label">
-              <input type="checkbox" name="aprovado" checked>
-              <span>Aprovar prorrogação</span>
-            </label>
-            <button type="submit" class="btn-primary">Registrar avaliação</button>
-          </form>
-        </article>
-      </div>
-    </section>
-
-    <!-- ETAPA 2: Crédito -->
-    <section class="section">
-      <div class="section-head op-head">
-        <div>
-          <p class="eyebrow">Etapa 2 de 4</p>
-          <h2>Concessão de crédito</h2>
-          <p class="section-desc">Pedidos aprovados onde o cliente marcou "solicitar crédito" aparecem aqui. O banco analisa e libera o financiamento. Pedidos sem crédito vão direto da Etapa 1 para a Etapa 3.</p>
-        </div>
-        <div class="op-badge-col">
-          <span class="op-count">{view.pedidosParaCredito.size}</span>
-          <small>pedidos aguardando crédito</small>
-        </div>
-      </div>
-      <div class="card op-card">
-        <div class="op-card-head">
-          <h3>Liberar crédito para pedido</h3>
-          <span class="badge info">{view.pedidosParaCredito.size} na fila</span>
-        </div>
-        <p class="op-desc">Preencha os dados do financiamento (valor, taxa de juros e número de parcelas) para o pedido selecionado. Após liberar, o pedido avança para geração de contrato.</p>
-        <form method="post" action="/app/creditos" class="form grid-form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-          <div class="field-row">
-            <div class="field">
-              <label for="bancoCredito">Banco concessor</label>
-              <select id="bancoCredito" name="agenteId" required>
-                {#for agente in view.bancos}
-                  <option value="{agente.id}">{agente.nome}</option>
-                {/for}
-              </select>
-            </div>
-            <div class="field">
-              <label for="pedidoCredito">Pedido aprovado</label>
-              <select id="pedidoCredito" name="pedidoId" required>
-                {#for pedido in view.pedidosParaCredito}
-                  <option value="{pedido.id}">Pedido #{pedido.id} — {view.descricaoAutomovel(pedido.automovelId)} — cliente #{pedido.clienteId}</option>
-                {/for}
-              </select>
-            </div>
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label for="valorCredito">Valor do crédito (R$)</label>
-              <input id="valorCredito" type="number" name="valor" value="900.00" step="0.01" min="0.01" required>
-            </div>
-            <div class="field">
-              <label for="jurosCredito">Taxa de juros (ex: 0.10 = 10%)</label>
-              <input id="jurosCredito" type="number" name="taxaJuros" value="0.10" step="0.01" min="0.01" required>
-            </div>
-            <div class="field">
-              <label for="parcelasCredito">Número de parcelas</label>
-              <input id="parcelasCredito" type="number" name="quantidadeParcelas" value="6" min="1" required>
-            </div>
-          </div>
-          <button type="submit" class="btn-primary">Liberar crédito</button>
-        </form>
-      </div>
-    </section>
-
-    <!-- ETAPA 3: Contrato -->
-    <section class="section">
-      <div class="section-head op-head">
-        <div>
-          <p class="eyebrow">Etapa 3 de 4</p>
-          <h2>Geração de contrato</h2>
-          <p class="section-desc">Pedidos com status "Aprovado" ou "Crédito aprovado" estão prontos para gerar o contrato oficial. Ao gerar, o veículo muda para "Em contrato" e o cliente recebe o PDF.</p>
-        </div>
-        <div class="op-badge-col">
-          <span class="op-count">{view.pedidosParaContrato.size}</span>
-          <small>prontos para contrato</small>
-        </div>
-      </div>
-      <div class="card op-card">
-        <div class="op-card-head">
-          <h3>Gerar contrato de aluguel</h3>
-          <span class="badge ok">{view.pedidosParaContrato.size} prontos</span>
-        </div>
-        <p class="op-desc">Selecione o pedido aprovado e o tipo de contrato. O sistema registra o contrato, bloqueia o veículo na frota e libera o PDF para o cliente.</p>
-        <form method="post" action="/app/contratos" class="form grid-form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-          <div class="field-row">
-            <div class="field">
-              <label for="pedidoContrato">Pedido aprovado</label>
-              <select id="pedidoContrato" name="pedidoId" required>
-                {#for pedido in view.pedidosParaContrato}
-                  <option value="{pedido.id}">Pedido #{pedido.id} — {view.descricaoAutomovel(pedido.automovelId)} — cliente #{pedido.clienteId}</option>
-                {/for}
-              </select>
-            </div>
-            <div class="field">
-              <!-- CORREÇÃO: tipo de contrato agora é select -->
-              <label for="tipoContrato">Tipo de contrato</label>
-              <select id="tipoContrato" name="tipoContrato" required>
-                <option value="ALUGUEL_MENSAL">Mensal</option>
-                <option value="ALUGUEL_SEMANAL">Semanal</option>
-                <option value="ALUGUEL_DIARIO">Diário</option>
-              </select>
-            </div>
-          </div>
-          <button type="submit" class="btn-primary">Gerar contrato</button>
-        </form>
-      </div>
-    </section>
-
-    <!-- ETAPA 4: Devolução -->
-    <section class="section">
-      <div class="section-head op-head">
-        <div>
-          <p class="eyebrow">Etapa 4 de 4</p>
-          <h2>Registro de devolução</h2>
-          <p class="section-desc">Quando o cliente devolve o veículo, registre a quilometragem final e eventuais avarias. O contrato é encerrado e o veículo volta a ficar disponível na frota.</p>
-        </div>
-        <div class="op-badge-col">
-          <span class="op-count">{view.contratosAtivos.size}</span>
-          <small>contratos ativos</small>
-        </div>
-      </div>
-      <div class="card op-card">
-        <div class="op-card-head">
-          <h3>Registrar devolução de veículo</h3>
-          <span class="badge info">{view.contratosAtivos.size} contratos ativos</span>
-        </div>
-        <p class="op-desc">Informe a quilometragem final do veículo no momento da devolução. Se houver avarias visíveis, descreva-as no campo correspondente para registro no contrato.</p>
-        <form method="post" action="/app/contratos/devolucao" class="form grid-form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-          <div class="field">
-            <label for="contratoDevolucao">Contrato a encerrar</label>
-            <select id="contratoDevolucao" name="contratoId" required>
-              {#for contrato in view.contratosAtivos}
-                <option value="{contrato.id}">Contrato #{contrato.id} — {view.descricaoAutomovel(contrato.automovelId)} — cliente #{contrato.clienteId} — até {contrato.dataFim}</option>
-              {/for}
-            </select>
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label for="kmFinal">Quilometragem final (km)</label>
-              <input id="kmFinal" type="number" name="quilometragemFinal" min="1" placeholder="Ex: 45000" required>
-            </div>
-            <div class="field">
-              <label for="avarias">Avarias observadas (opcional)</label>
-              <textarea id="avarias" name="avarias" rows="2" placeholder="Descreva arranhões, amassados ou outras avarias. Deixe em branco se nenhuma."></textarea>
-            </div>
-          </div>
-          <button type="submit" class="btn-primary">Finalizar contrato e devolver veículo</button>
-        </form>
-      </div>
-    </section>
-
-    <!-- Gestão de veículos (antes "Frota") -->
-    <section class="section">
-      <div class="section-head op-head">
-        <div>
-          <p class="eyebrow">Gestão de veículos</p>
-          <h2>Cadastro e manutenção da frota</h2>
-          <p class="section-desc">Cadastre novos veículos, atualize dados ou status de veículos existentes e remova da frota quando necessário. Veículos com pedidos ativos ou contratos em andamento não podem ser removidos.</p>
-        </div>
-        <div class="op-badge-col">
-          <span class="op-count">{view.automoveis.size}</span>
-          <small>veículos cadastrados</small>
-        </div>
-      </div>
-      <div class="two-col">
-        <article class="card op-card">
-          <h3>Cadastrar novo veículo</h3>
-          <p class="op-desc">Adicione um novo veículo à frota da empresa. Matrícula e placa devem ser únicos no sistema.</p>
-          <form method="post" action="/app/frota/cadastrar" class="form">
-            <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-            <div class="field">
-              <label for="empresaId">Empresa proprietária</label>
-              <select id="empresaId" name="empresaId" required>
-                {#for agente in view.empresas}
-                  <option value="{agente.id}">{agente.nome}</option>
-                {/for}
-              </select>
-            </div>
-            <div class="field-row">
-              <div class="field">
-                <label for="matriculaNovo">Matrícula interna</label>
-                <input id="matriculaNovo" type="text" name="matricula" placeholder="Ex: AUTO-010" required>
-              </div>
-              <div class="field">
-                <label for="placaNovo">Placa</label>
-                <input id="placaNovo" type="text" name="placa" placeholder="Ex: ABC1D23" required>
-              </div>
-            </div>
-            <div class="field-row">
-              <div class="field">
-                <label for="marcaNovo">Marca</label>
-                <input id="marcaNovo" type="text" name="marca" placeholder="Ex: Toyota" required>
-              </div>
-              <div class="field">
-                <label for="modeloNovo">Modelo</label>
-                <input id="modeloNovo" type="text" name="modelo" placeholder="Ex: Corolla" required>
-              </div>
-            </div>
-            <div class="field-row">
-              <div class="field">
-                <label for="anoNovo">Ano de fabricação</label>
-                <input id="anoNovo" type="number" name="ano" min="2000" placeholder="Ex: 2023" required>
-              </div>
-              <div class="field">
-                <label for="valorNovo">Valor da diária (R$)</label>
-                <input id="valorNovo" type="number" name="valorDiaria" step="0.01" min="0.01" placeholder="Ex: 180.00" required>
-              </div>
-            </div>
-            <button type="submit" class="btn-primary">Cadastrar veículo</button>
-          </form>
-        </article>
-
-        <article class="card">
-          <div class="card-head">
-            <h3>Veículos cadastrados</h3>
-            <span class="muted">{view.automoveis.size} no total</span>
-          </div>
-          <p class="op-desc" style="margin-bottom:12px">Para atualizar, edite os campos inline e clique em "Salvar". Para remover, o veículo não pode ter pedidos ou contratos ativos.</p>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Veículo</th>
-                  <th>Status</th>
-                  <th>Editar dados</th>
-                  <th>Remover</th>
-                </tr>
-              </thead>
-              <tbody>
-                {#for automovel in view.automoveis}
-                  <tr>
-                    <td>#{automovel.id}</td>
-                    <td>
-                      {automovel.marca} {automovel.modelo}
-                      <br><small>{automovel.placa} · {automovel.matricula} · {view.formatarValor(automovel.valorDiaria)}</small>
-                    </td>
-                    <td>
-                      <span class="badge {view.badgeClasseAutomovel(automovel.status)}">{view.rotuloStatusAutomovel(automovel.status)}</span>
-                    </td>
-                    <td>
-                      <form method="post" action="/app/frota/atualizar" class="mini-form">
-                        <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-                        <input type="hidden" name="automovelId" value="{automovel.id}">
-                        <input type="text" name="matricula" value="{automovel.matricula}" required>
-                        <input type="number" name="ano" value="{automovel.ano}" min="2000" required>
-                        <input type="text" name="marca" value="{automovel.marca}" required>
-                        <input type="text" name="modelo" value="{automovel.modelo}" required>
-                        <input type="text" name="placa" value="{automovel.placa}" required>
-                        <input type="number" name="valorDiaria" value="{automovel.valorDiaria}" step="0.01" min="0.01" required>
-                        <!-- CORREÇÃO: usar #if/selected em vez de selected={...} -->
-                        <select name="status">
-                          <option value="DISPONIVEL" {#if view.automovelStatusDisponivel(automovel)}selected{/if}>Disponível</option>
-                          <option value="ALUGADO" {#if view.automovelStatusAlugado(automovel)}selected{/if}>Em contrato</option>
-                          <option value="MANUTENCAO" {#if view.automovelStatusManutencao(automovel)}selected{/if}>Manutenção</option>
-                        </select>
-                        <button type="submit" class="btn-primary btn-sm">Salvar</button>
-                      </form>
-                    </td>
-                    <td>
-                      <form method="post" action="/app/frota/remover">
-                        <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-                        <input type="hidden" name="automovelId" value="{automovel.id}">
-                        <button type="submit" class="btn-secondary btn-sm" title="Só é possível remover veículos sem pedidos ou contratos ativos">Remover</button>
-                      </form>
-                    </td>
-                  </tr>
-                {/for}
-              </tbody>
-            </table>
-          </div>
-        </article>
-      </div>
-    </section>
-
-  </div><!-- /panel-operacional -->
-
-</main>
-
-<script>
-  // ---- Tab navigation ----
-  const tabs   = document.querySelectorAll('.tab');
-  const panels = document.querySelectorAll('.panel');
-
-  function activateTab(panelId) {
-    tabs.forEach(t => t.classList.toggle('active', t.dataset.panel === panelId));
-    panels.forEach(p => p.classList.toggle('active', p.id === 'panel-' + panelId));
-  }
-
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      activateTab(tab.dataset.panel);
-      history.replaceState(null, '', '#' + tab.dataset.panel);
-    });
-  });
-
-  // Restaurar aba pelo hash ou tratar deep link "Solicitar aluguel"
-  const hash = location.hash.slice(1);
-  if (hash === 'novo-pedido' || hash === 'catalogo') {
-    activateTab('catalogo');
-    if (hash === 'novo-pedido') {
-      setTimeout(() => document.getElementById('novo-pedido')?.scrollIntoView({ behavior: 'smooth' }), 80);
-    }
-  } else if (['area', 'acesso', 'operacional'].includes(hash)) {
-    activateTab(hash);
-  }
-
-  // Rolar automaticamente para o alerta se houver mensagem de sucesso ou erro
-  const alertEl = document.getElementById('page-alert');
-  if (alertEl) {
-    alertEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-
-  // ---- SSE – notificações em tempo real ----
-  (() => {
-    const clienteId = document.body.dataset.clienteId;
-    const list      = document.getElementById('notification-list');
-    const toastArea = document.getElementById('toast-area');
-    if (!clienteId || !list || !toastArea) return;
-
-    const source = new EventSource('/api/clientes/' + clienteId + '/notificacoes/stream');
-
-    source.onmessage = (event) => {
-      const n = JSON.parse(event.data);
-
-      const article = document.createElement('article');
-      article.className = 'notif-item fresh';
-      article.innerHTML =
-        '<strong>' + n.titulo + '</strong>' +
-        '<p>' + n.mensagem + '</p>' +
-        '<small>' + n.dataCriacao + '</small>';
-      list.prepend(article);
-
-      const toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.innerHTML = '<strong>' + n.titulo + '</strong><span>' + n.mensagem + '</span>';
-      toastArea.appendChild(toast);
-      setTimeout(() => toast.remove(), 6000);
-    };
-  })();
-</script>
-
-=======
-
-          <label for="justificativa">Justificativa</label>
-          <textarea id="justificativa" name="justificativa" rows="3" required>Viagem a trabalho</textarea>
-
-          <label class="check">
-            <input type="checkbox" name="requerCredito" checked>
-            <span>Solicitar credito</span>
-          </label>
-
-          <button type="submit">Criar pedido</button>
-        </form>
-      </article>
-    </div>
-
-    <div class="catalog-grid">
-      {#for automovel in view.catalogoDisponivel}
-        <article class="vehicle-card">
-          <div class="vehicle-head">
-            <h3>{automovel.marca} {automovel.modelo}</h3>
-            <span class="badge {view.badgeClasseAutomovel(automovel.status)}">{view.rotuloStatusAutomovel(automovel.status)}</span>
-          </div>
-          <p class="muted">Placa {automovel.placa} | Matricula {automovel.matricula}</p>
-          <div class="vehicle-meta">
-            <span>Ano {automovel.ano}</span>
-            <strong>{view.formatarValor(automovel.valorDiaria)} / dia</strong>
-          </div>
-          <a class="link-button" href="/app?clienteId={view.clienteSelecionado}&automovelId={automovel.id}#novo-pedido">Solicitar aluguel</a>
-        </article>
-      {/for}
-      {#if !view.temCatalogo}
-        <article class="card">
-          <p class="empty">Nenhum veiculo disponivel com esse filtro.</p>
-        </article>
+      {#if view.success}
+        <div class="alert alert-success" id="page-alert">{view.success}</div>
       {/if}
-    </div>
-  </section>
+      {#if view.error}
+        <div class="alert alert-error" id="page-alert">{view.error}</div>
+      {/if}
 
-  <section class="section">
-    <div class="section-title">
-      <div>
-        <p class="eyebrow">Cliente</p>
-        <h2>Pedidos e contratos</h2>
-      </div>
-      <span class="muted">Tudo do cliente atual em um unico lugar.</span>
-    </div>
-
-    <div class="grid two">
-      <article class="card">
-        <h3>Atualizar pedido</h3>
-        <form method="post" action="/app/pedidos/atualizar" class="form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-
-          <label for="pedidoEdicao">Pedido</label>
-          <select id="pedidoEdicao" name="pedidoId" required>
-            {#for pedido in view.pedidosEditaveis}
-              <option value="{pedido.id}">Pedido {pedido.id} | {view.rotuloStatusPedido(pedido.status)}</option>
-            {/for}
-          </select>
-
-          <label for="automovelEdicao">Automovel</label>
-          <select id="automovelEdicao" name="automovelId" required>
-            {#for automovel in view.catalogoDisponivel}
-              <option value="{automovel.id}">{automovel.marca} {automovel.modelo} | {automovel.placa}</option>
-            {/for}
-          </select>
-
-          <div class="grid two compact">
-            <div>
-              <label for="dataInicioEdicao">Inicio</label>
-              <input id="dataInicioEdicao" type="date" name="dataInicio" required>
+      <main class="content">
+        <section class="tab-panel is-active" data-tab-panel="resumo">
+          <div class="hero-card">
+            <div class="hero-content">
+              <span class="pill pill-light">Locação inteligente</span>
+              <h2>Olá, {view.nomeClienteSelecionado}</h2>
+              <p>Acompanhe suas solicitações, visualize contratos ativos, receba notificações em tempo real e gerencie a operação da locadora em um único painel.</p>
+              <div class="hero-actions">
+                <button type="button" class="btn btn-white" data-tab-jump="catalogo">Solicitar aluguel</button>
+                <button type="button" class="btn btn-ghost-light" data-tab-jump="solicitacoes">Ver meus pedidos</button>
+              </div>
             </div>
-            <div>
-              <label for="dataFimEdicao">Fim</label>
-              <input id="dataFimEdicao" type="date" name="dataFim" required>
+            <div class="hero-metric">
+              <small>Contratos ativos</small>
+              <strong>{view.totalContratosAtivos}</strong>
+              <span>{view.totalDisponiveis} veículos disponíveis</span>
             </div>
           </div>
 
-          <label for="justificativaEdicao">Justificativa</label>
-          <textarea id="justificativaEdicao" name="justificativa" rows="3" required>Ajuste de agenda</textarea>
+          <div class="kpi-grid">
+            <article class="kpi-card">
+              <span>Disponíveis</span>
+              <strong>{view.totalDisponiveis}</strong>
+              <small>veículos prontos para aluguel</small>
+            </article>
+            <article class="kpi-card">
+              <span>Pendentes do mês</span>
+              <strong>{view.totalPendentesMes}</strong>
+              <small>aguardando análise</small>
+            </article>
+            <article class="kpi-card">
+              <span>Aprovados</span>
+              <strong>{view.totalAprovadosMes}</strong>
+              <small>pedidos liberados</small>
+            </article>
+            <article class="kpi-card">
+              <span>Rejeitados</span>
+              <strong>{view.totalRejeitadosMes}</strong>
+              <small>pedidos encerrados</small>
+            </article>
+          </div>
 
-          <label class="check">
-            <input type="checkbox" name="requerCredito" checked>
-            <span>Manter credito</span>
-          </label>
+          <div class="grid two-columns">
+            <section class="card">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Central de mensagens</p>
+                  <h2>Notificações</h2>
+                </div>
+                <span class="counter">{view.totalNotificacoes}</span>
+              </div>
+              <div id="toast-area" class="toast-area"></div>
+              <div id="notification-list" class="stack-list">
+                {#for n in view.notificacoes}
+                  <article class="notification-item">
+                    <span class="item-dot"></span>
+                    <div>
+                      <strong>{n.titulo}</strong>
+                      <p>{n.mensagem}</p>
+                      <small>{n.dataCriacao}</small>
+                    </div>
+                  </article>
+                {#else}
+                  <div class="empty-state">Nenhuma notificação para este cliente.</div>
+                {/for}
+              </div>
+            </section>
 
-          <button type="submit">Salvar alteracoes</button>
-        </form>
-      </article>
-
-      <article class="card">
-        <h3>Solicitar prorrogacao</h3>
-        <form method="post" action="/app/pedidos/prorrogacao" class="form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-
-          <label for="contratoProrrogacao">Contrato ativo</label>
-          <select id="contratoProrrogacao" name="contratoId" required>
-            {#for contrato in view.contratosClienteAtivos}
-              <option value="{contrato.id}">Contrato {contrato.id} | {view.descricaoAutomovel(contrato.automovelId)} | ate {contrato.dataFim}</option>
-            {/for}
-          </select>
-
-          <label for="novaDataFim">Nova data final</label>
-          <input id="novaDataFim" type="date" name="novaDataFim" required>
-
-          <label for="justificativaProrrogacao">Motivo</label>
-          <textarea id="justificativaProrrogacao" name="justificativa" rows="3" required>Preciso manter o carro por mais alguns dias.</textarea>
-
-          <button type="submit">Enviar prorrogacao</button>
-        </form>
-      </article>
-    </div>
-
-    <div class="grid two">
-      <article class="card">
-        <div class="card-head">
-          <h3>Meus pedidos</h3>
-          <span>{view.pedidosClienteOrdenados.size} registros</span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-            <tr>
-              <th>ID</th>
-              <th>Tipo</th>
-              <th>Status</th>
-              <th>Automovel</th>
-              <th>Periodo</th>
-              <th>Valor</th>
-              <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            {#for pedido in view.pedidosClienteOrdenados}
-              <tr>
-                <td>{pedido.id}</td>
-                <td>{view.rotuloTipoPedido(pedido.tipoPedido)}</td>
-                <td><span class="badge {view.badgeClasse(pedido.status)}">{view.rotuloStatusPedido(pedido.status)}</span></td>
-                <td>{view.descricaoAutomovel(pedido.automovelId)}</td>
-                <td>{pedido.dataInicio} ate {pedido.dataFim}</td>
-                <td>{view.formatarValor(pedido.valorEstimado)}</td>
-                <td>
-                  <form method="post" action="/app/pedidos/cancelar">
-                    <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-                    <input type="hidden" name="pedidoId" value="{pedido.id}">
-                    <button type="submit" class="secondary">Cancelar</button>
-                  </form>
-                </td>
-              </tr>
-            {/for}
-            </tbody>
-          </table>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-head">
-          <h3>Meus contratos</h3>
-          <span>{view.contratosCliente.size} registros</span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-            <tr>
-              <th>ID</th>
-              <th>Automovel</th>
-              <th>Status</th>
-              <th>Periodo</th>
-              <th>PDF</th>
-            </tr>
-            </thead>
-            <tbody>
-            {#for contrato in view.contratosCliente}
-              <tr>
-                <td>{contrato.id}</td>
-                <td>{view.descricaoAutomovel(contrato.automovelId)}</td>
-                <td>{view.rotuloStatusContrato(contrato.status)}</td>
-                <td>{contrato.dataInicio} ate {contrato.dataFim}</td>
-                <td>
-                  {#if contrato.ativo}
-                    <a class="table-link" href="/api/contratos/{contrato.id}/pdf">Baixar PDF</a>
+            <section class="card">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Fluxo operacional</p>
+                  <h2>Status do mês</h2>
+                </div>
+              </div>
+              <div class="workflow">
+                <div class="workflow-step">
+                  <span>{view.totalPendentesMes}</span>
+                  <strong>Análise</strong>
+                  <small>Pedidos recebidos</small>
+                </div>
+                <div class="workflow-line"></div>
+                <div class="workflow-step">
+                  <span>{view.totalAprovadosMes}</span>
+                  <strong>Aprovação</strong>
+                  <small>Prontos para contrato</small>
+                </div>
+                <div class="workflow-line"></div>
+                <div class="workflow-step">
+                  <span>{view.totalContratosAtivos}</span>
+                  <strong>Contrato</strong>
+                  <small>Aluguéis ativos</small>
+                </div>
+              </div>
+              <div class="mini-grid">
+                <div class="mini-card">
+                  <small>Empresa</small>
+                  {#for agente in view.empresas}
+                    <strong>{agente.nome}</strong>
                   {#else}
-                    <span class="muted">Indisponivel</span>
-                  {/if}
-                </td>
-              </tr>
-            {/for}
-            </tbody>
-          </table>
-        </div>
-      </article>
-    </div>
-  </section>
+                    <strong>Não cadastrada</strong>
+                  {/for}
+                </div>
+                <div class="mini-card">
+                  <small>Banco</small>
+                  {#for agente in view.bancos}
+                    <strong>{agente.nome}</strong>
+                  {#else}
+                    <strong>Não cadastrado</strong>
+                  {/for}
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
 
-  <section class="section">
-    <div class="section-title">
-      <div>
-        <p class="eyebrow">Agente</p>
-        <h2>Painel operacional</h2>
-      </div>
-      <span class="muted">Frota, analise, contratos e devolucao.</span>
-    </div>
-
-    <div class="stats compact-stats">
-      <article class="stat">
-        <span>Analise aluguel</span>
-        <strong>{view.pedidosParaAvaliacao.size}</strong>
-        <small>pedidos aguardando empresa</small>
-      </article>
-      <article class="stat">
-        <span>Prorrogacoes</span>
-        <strong>{view.prorrogacoesPendentes.size}</strong>
-        <small>solicitacoes em fila</small>
-      </article>
-      <article class="stat">
-        <span>Credito</span>
-        <strong>{view.pedidosParaCredito.size}</strong>
-        <small>pedidos aguardando banco</small>
-      </article>
-      <article class="stat">
-        <span>Contrato</span>
-        <strong>{view.pedidosParaContrato.size}</strong>
-        <small>prontos para oficializar</small>
-      </article>
-    </div>
-
-    <div class="grid two">
-      <article class="card">
-        <h3>Cadastrar automovel</h3>
-        <form method="post" action="/app/frota/cadastrar" class="form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-
-          <label for="empresaId">Empresa</label>
-          <select id="empresaId" name="empresaId" required>
-            {#for agente in view.empresas}
-              <option value="{agente.id}">{agente.nome}</option>
-            {/for}
-          </select>
-
-          <div class="grid two compact">
+        <section class="tab-panel" data-tab-panel="catalogo">
+          <div class="section-head page-section-head">
             <div>
-              <label for="matriculaNovo">Matricula</label>
-              <input id="matriculaNovo" type="text" name="matricula" required>
+              <p class="eyebrow">Frota disponível</p>
+              <h2>Catálogo de veículos</h2>
             </div>
-            <div>
-              <label for="placaNovo">Placa</label>
-              <input id="placaNovo" type="text" name="placa" required>
-            </div>
+            <span class="muted">{view.resumoCatalogo}</span>
           </div>
 
-          <div class="grid two compact">
-            <div>
-              <label for="marcaNovo">Marca</label>
-              <input id="marcaNovo" type="text" name="marca" required>
-            </div>
-            <div>
-              <label for="modeloNovo">Modelo</label>
-              <input id="modeloNovo" type="text" name="modelo" required>
-            </div>
-          </div>
+          <section class="card filter-card">
+            <form method="get" action="/app" class="filter-form">
+              <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
+              <label>
+                Marca
+                <input type="text" name="marca" value="{view.formatarMarcaFiltro}" placeholder="Toyota, Honda, Jeep...">
+              </label>
+              <label>
+                Ano mínimo
+                <input type="number" name="anoMinimo" value="{view.formatarAnoMinimoFiltro}" min="2000" placeholder="2020">
+              </label>
+              <button type="submit" class="btn btn-primary">Filtrar frota</button>
+            </form>
+          </section>
 
-          <div class="grid two compact">
-            <div>
-              <label for="anoNovo">Ano</label>
-              <input id="anoNovo" type="number" name="ano" min="2000" required>
-            </div>
-            <div>
-              <label for="valorNovo">Diaria</label>
-              <input id="valorNovo" type="number" name="valorDiaria" step="0.01" min="0.01" required>
-            </div>
-          </div>
-
-          <button type="submit">Salvar automovel</button>
-        </form>
-      </article>
-
-      <article class="card">
-        <div class="card-head">
-          <h3>Frota</h3>
-          <span>{view.automoveis.size} automoveis</span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-            <tr>
-              <th>ID</th>
-              <th>Dados</th>
-              <th>Status</th>
-              <th>Atualizar</th>
-              <th>Remover</th>
-            </tr>
-            </thead>
-            <tbody>
-            {#for automovel in view.automoveis}
-              <tr>
-                <td>{automovel.id}</td>
-                <td>{automovel.marca} {automovel.modelo}<br><small>{automovel.placa} | {automovel.matricula} | {view.formatarValor(automovel.valorDiaria)}</small></td>
-                <td><span class="badge {view.badgeClasseAutomovel(automovel.status)}">{view.rotuloStatusAutomovel(automovel.status)}</span></td>
-                <td>
-                  <form method="post" action="/app/frota/atualizar" class="mini-form">
+          <div class="catalog-grid">
+            {#for automovel in view.catalogoDisponivel}
+              <article class="vehicle-card">
+                <div class="vehicle-visual js-vehicle-image"
+                     data-vehicle-id="{automovel.id}"
+                     data-vehicle-brand="{automovel.marca}"
+                     data-vehicle-model="{automovel.modelo}">
+                  <span>{automovel.marca}</span>
+                </div>
+                <div class="vehicle-body">
+                  <div class="vehicle-top">
+                    <div>
+                      <h3>{automovel.marca} {automovel.modelo}</h3>
+                      <p>{automovel.ano} · Placa {automovel.placa}</p>
+                    </div>
+                    <span class="badge {view.badgeClasseAutomovel(automovel.status)}">{view.rotuloStatusAutomovel(automovel.status)}</span>
+                  </div>
+                  <div class="vehicle-meta">
+                    <small>Matrícula {automovel.matricula}</small>
+                    <strong>{view.formatarValor(automovel.valorDiaria)}<span>/dia</span></strong>
+                  </div>
+                  <form method="post" action="/app/pedidos" class="rent-form">
                     <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
                     <input type="hidden" name="automovelId" value="{automovel.id}">
-                    <input type="text" name="matricula" value="{automovel.matricula}" required>
-                    <input type="number" name="ano" value="{automovel.ano}" min="2000" required>
-                    <input type="text" name="marca" value="{automovel.marca}" required>
-                    <input type="text" name="modelo" value="{automovel.modelo}" required>
-                    <input type="text" name="placa" value="{automovel.placa}" required>
-                    <input type="number" name="valorDiaria" value="{automovel.valorDiaria}" step="0.01" min="0.01" required>
-                    <select name="status">
-                      <option value="DISPONIVEL" selected={view.automovelStatusDisponivel(automovel)}>Disponivel</option>
-                      <option value="ALUGADO" selected={view.automovelStatusAlugado(automovel)}>Em contrato</option>
-                      <option value="MANUTENCAO" selected={view.automovelStatusManutencao(automovel)}>Manutencao</option>
-                    </select>
-                    <button type="submit">Atualizar</button>
+                    <div class="form-grid two">
+                      <label>
+                        Início
+                        <input type="date" name="dataInicio" required>
+                      </label>
+                      <label>
+                        Fim
+                        <input type="date" name="dataFim" required>
+                      </label>
+                    </div>
+                    <label>
+                      Justificativa
+                      <textarea name="justificativa" rows="3" required>Viagem a trabalho</textarea>
+                    </label>
+                    <label class="checkbox-line">
+                      <input type="checkbox" name="requerCredito">
+                      <span>Solicitar análise de crédito junto</span>
+                    </label>
+                    <button type="submit" class="btn btn-primary btn-full">Criar pedido</button>
                   </form>
-                </td>
-                <td>
+                </div>
+              </article>
+            {#else}
+              <div class="empty-card catalog-empty">
+                <strong>Nenhum veículo encontrado</strong>
+                <p>Altere os filtros ou cadastre novos veículos no painel operacional.</p>
+              </div>
+            {/for}
+          </div>
+        </section>
+
+        <section class="tab-panel" data-tab-panel="solicitacoes">
+          <div class="section-head page-section-head">
+            <div>
+              <p class="eyebrow">Acompanhamento</p>
+              <h2>Minhas solicitações</h2>
+            </div>
+            <span class="muted">Cliente #{view.clienteSelecionado}</span>
+          </div>
+
+          <div class="grid two-columns align-start">
+            <section class="card">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Pedidos</p>
+                  <h2>Histórico de pedidos</h2>
+                </div>
+                <span class="counter">{view.pedidosClienteOrdenados.size}</span>
+              </div>
+
+              <div class="request-list">
+                {#for pedido in view.pedidosClienteOrdenados}
+                  <article class="request-card">
+                    <div class="request-top">
+                      <div>
+                        <span class="request-id">Pedido #{pedido.id}</span>
+                        <h3>{view.descricaoAutomovel(pedido.automovelId)}</h3>
+                      </div>
+                      <span class="badge {view.badgeClasse(pedido.status)}">{view.rotuloStatusPedido(pedido.status)}</span>
+                    </div>
+                    <div class="request-meta">
+                      <span>{view.rotuloTipoPedido(pedido.tipoPedido)}</span>
+                      <span>{pedido.dataInicio} até {pedido.dataFim}</span>
+                      <strong>{view.formatarValor(pedido.valorEstimado)}</strong>
+                    </div>
+                    <div class="progress status-{view.slugStatus(pedido.status)}" aria-hidden="true"><span></span></div>
+                    {#if pedido.parecerAgente}
+                      <p class="note"><strong>Parecer:</strong> {pedido.parecerAgente}</p>
+                    {/if}
+                    {#if view.podeCancelar(pedido.status)}
+                      <form method="post" action="/app/pedidos/cancelar" class="inline-action">
+                        <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
+                        <input type="hidden" name="pedidoId" value="{pedido.id}">
+                        <button type="submit" class="btn btn-secondary btn-small">Cancelar pedido</button>
+                      </form>
+                    {/if}
+                  </article>
+                {#else}
+                  <div class="empty-state">Você ainda não possui pedidos. Acesse o catálogo para começar.</div>
+                {/for}
+              </div>
+            </section>
+
+            <div class="stack">
+              <section class="card">
+                <div class="section-head">
+                  <div>
+                    <p class="eyebrow">Contratos</p>
+                    <h2>Meus contratos</h2>
+                  </div>
+                  <span class="counter">{view.contratosCliente.size}</span>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Veículo</th>
+                        <th>Status</th>
+                        <th>Período</th>
+                        <th>PDF</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {#for contrato in view.contratosCliente}
+                        <tr>
+                          <td>#{contrato.id}</td>
+                          <td>{view.descricaoAutomovel(contrato.automovelId)}</td>
+                          <td><span class="badge info">{view.rotuloStatusContrato(contrato.status)}</span></td>
+                          <td>{contrato.dataInicio} até {contrato.dataFim}</td>
+                          <td>
+                            {#if contrato.ativo}
+                              <a class="table-link" href="/api/contratos/{contrato.id}/pdf">PDF</a>
+                            {#else}
+                              <span class="muted">—</span>
+                            {/if}
+                          </td>
+                        </tr>
+                      {#else}
+                        <tr><td colspan="5" class="empty-table">Nenhum contrato encontrado.</td></tr>
+                      {/for}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section class="card">
+                <div class="section-head">
+                  <div>
+                    <p class="eyebrow">Extensão</p>
+                    <h2>Solicitar prorrogação</h2>
+                  </div>
+                </div>
+                <form method="post" action="/app/pedidos/prorrogacao" class="form-stack">
+                  <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
+                  <label>
+                    Contrato ativo
+                    <select name="contratoId" required>
+                      {#for contrato in view.contratosClienteAtivos}
+                        <option value="{contrato.id}">#{contrato.id} · {view.descricaoAutomovel(contrato.automovelId)} · até {contrato.dataFim}</option>
+                      {#else}
+                        <option value="" disabled selected>Sem contratos ativos</option>
+                      {/for}
+                    </select>
+                  </label>
+                  <label>
+                    Nova data final
+                    <input type="date" name="novaDataFim" required>
+                  </label>
+                  <label>
+                    Motivo
+                    <textarea name="justificativa" rows="3" required>Preciso manter o carro por mais alguns dias.</textarea>
+                  </label>
+                  <button type="submit" class="btn btn-primary btn-full">Enviar prorrogação</button>
+                </form>
+              </section>
+            </div>
+          </div>
+
+          <section class="card section-spacer">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Alteração</p>
+                <h2>Atualizar pedido existente</h2>
+              </div>
+            </div>
+            <form method="post" action="/app/pedidos/atualizar" class="form-grid five">
+              <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
+              <label>
+                Pedido
+                <select name="pedidoId" required>
+                  {#for pedido in view.pedidosEditaveis}
+                    <option value="{pedido.id}">#{pedido.id} · {view.descricaoAutomovel(pedido.automovelId)}</option>
+                  {#else}
+                    <option value="" disabled selected>Nenhum pedido editável</option>
+                  {/for}
+                </select>
+              </label>
+              <label>
+                Veículo
+                <select name="automovelId" required>
+                  {#for automovel in view.catalogoDisponivel}
+                    <option value="{automovel.id}">{automovel.marca} {automovel.modelo} · {automovel.placa}</option>
+                  {/for}
+                </select>
+              </label>
+              <label>
+                Início
+                <input type="date" name="dataInicio" required>
+              </label>
+              <label>
+                Fim
+                <input type="date" name="dataFim" required>
+              </label>
+              <label>
+                Justificativa
+                <input type="text" name="justificativa" value="Alteração de datas" required>
+              </label>
+              <label class="checkbox-line span-two">
+                <input type="checkbox" name="requerCredito">
+                <span>Manter/solicitar crédito</span>
+              </label>
+              <button type="submit" class="btn btn-primary">Atualizar pedido</button>
+            </form>
+          </section>
+        </section>
+
+        <section class="tab-panel" data-tab-panel="acesso">
+          <div class="section-head page-section-head">
+            <div>
+              <p class="eyebrow">Conta</p>
+              <h2>Acesso e cadastro</h2>
+            </div>
+            <span class="muted">Credencial demo: {view.credencialInicialCliente}</span>
+          </div>
+
+          <div class="grid two-columns align-start">
+            <section class="card auth-card">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Entrar</p>
+                  <h2>Login rápido</h2>
+                </div>
+              </div>
+              <form method="post" action="/app/login" class="form-stack">
+                <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
+                <label>
+                  E-mail
+                  <input type="email" name="email" value="maria@cliente.com" required>
+                </label>
+                <label>
+                  Senha
+                  <input type="password" name="senha" value="123456" required>
+                </label>
+                <button type="submit" class="btn btn-primary btn-full">Entrar</button>
+              </form>
+            </section>
+
+            <section class="card auth-card">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Novo cliente</p>
+                  <h2>Cadastrar cliente</h2>
+                </div>
+              </div>
+              <form method="post" action="/app/clientes/cadastro" class="form-grid two">
+                <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
+                <label>
+                  Nome
+                  <input type="text" name="nome" placeholder="Nome completo" required>
+                </label>
+                <label>
+                  E-mail
+                  <input type="email" name="email" placeholder="cliente@email.com" required>
+                </label>
+                <label>
+                  Senha
+                  <input type="password" name="senha" placeholder="Mínimo 6 caracteres" required>
+                </label>
+                <label>
+                  CPF
+                  <input type="text" name="cpf" placeholder="000.000.000-00" required>
+                </label>
+                <label>
+                  RG
+                  <input type="text" name="rg" placeholder="MG-00.000.000" required>
+                </label>
+                <label>
+                  Rendimento
+                  <input type="number" name="rendimento" min="1" step="0.01" placeholder="4500.00" required>
+                </label>
+                <label class="span-two">
+                  Endereço
+                  <input type="text" name="endereco" placeholder="Rua, número, bairro, cidade" required>
+                </label>
+                <button type="submit" class="btn btn-primary span-two">Criar cadastro</button>
+              </form>
+            </section>
+          </div>
+        </section>
+
+        <section class="tab-panel" data-tab-panel="operacional">
+          <div class="section-head page-section-head">
+            <div>
+              <p class="eyebrow">Administração</p>
+              <h2>Painel operacional</h2>
+            </div>
+            <span class="muted">Empresa, banco, contrato e frota</span>
+          </div>
+
+          <div class="ops-grid">
+            <section class="card">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Empresa</p>
+                  <h2>Analisar pedido</h2>
+                </div>
+                <span class="counter">{view.pedidosParaAvaliacao.size}</span>
+              </div>
+              <form method="post" action="/app/avaliacoes" class="form-stack">
+                <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
+                <label>
+                  Agente empresa
+                  <select name="agenteId" required>
+                    {#for agente in view.empresas}
+                      <option value="{agente.id}">{agente.nome}</option>
+                    {/for}
+                  </select>
+                </label>
+                <label>
+                  Pedido
+                  <select name="pedidoId" required>
+                    {#for pedido in view.pedidosParaAvaliacao}
+                      <option value="{pedido.id}">#{pedido.id} · {view.descricaoAutomovel(pedido.automovelId)}</option>
+                    {#else}
+                      <option value="" disabled selected>Sem pedidos para análise</option>
+                    {/for}
+                  </select>
+                </label>
+                <label>
+                  Parecer
+                  <textarea name="parecer" rows="3" required>Perfil aprovado para locação.</textarea>
+                </label>
+                <label class="checkbox-line">
+                  <input type="checkbox" name="aprovado" checked>
+                  <span>Aprovar pedido</span>
+                </label>
+                <button type="submit" class="btn btn-primary btn-full">Salvar análise</button>
+              </form>
+            </section>
+
+            <section class="card">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Banco</p>
+                  <h2>Conceder crédito</h2>
+                </div>
+                <span class="counter">{view.pedidosParaCredito.size}</span>
+              </div>
+              <form method="post" action="/app/creditos" class="form-stack">
+                <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
+                <label>
+                  Banco
+                  <select name="agenteId" required>
+                    {#for agente in view.bancos}
+                      <option value="{agente.id}">{agente.nome}</option>
+                    {/for}
+                  </select>
+                </label>
+                <label>
+                  Pedido
+                  <select name="pedidoId" required>
+                    {#for pedido in view.pedidosParaCredito}
+                      <option value="{pedido.id}">#{pedido.id} · {view.formatarValor(pedido.valorEstimado)}</option>
+                    {#else}
+                      <option value="" disabled selected>Sem pedidos aguardando crédito</option>
+                    {/for}
+                  </select>
+                </label>
+                <div class="form-grid three compact">
+                  <label>
+                    Valor
+                    <input type="number" name="valor" min="1" step="0.01" value="5000.00" required>
+                  </label>
+                  <label>
+                    Juros %
+                    <input type="number" name="taxaJuros" min="0.01" step="0.01" value="2.50" required>
+                  </label>
+                  <label>
+                    Parcelas
+                    <input type="number" name="quantidadeParcelas" min="1" step="1" value="12" required>
+                  </label>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Aprovar crédito</button>
+              </form>
+            </section>
+
+            <section class="card">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Contrato</p>
+                  <h2>Gerar contrato</h2>
+                </div>
+                <span class="counter">{view.pedidosParaContrato.size}</span>
+              </div>
+              <form method="post" action="/app/contratos" class="form-stack">
+                <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
+                <label>
+                  Pedido aprovado
+                  <select name="pedidoId" required>
+                    {#for pedido in view.pedidosParaContrato}
+                      <option value="{pedido.id}">#{pedido.id} · {view.descricaoAutomovel(pedido.automovelId)}</option>
+                    {#else}
+                      <option value="" disabled selected>Sem pedidos prontos</option>
+                    {/for}
+                  </select>
+                </label>
+                <label>
+                  Tipo de contrato
+                  <input type="text" name="tipoContrato" value="Contrato padrão de aluguel" required>
+                </label>
+                <button type="submit" class="btn btn-primary btn-full">Gerar contrato</button>
+              </form>
+            </section>
+
+            <section class="card">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Devolução</p>
+                  <h2>Registrar entrega</h2>
+                </div>
+                <span class="counter">{view.contratosAtivos.size}</span>
+              </div>
+              <form method="post" action="/app/contratos/devolucao" class="form-stack">
+                <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
+                <label>
+                  Contrato ativo
+                  <select name="contratoId" required>
+                    {#for contrato in view.contratosAtivos}
+                      <option value="{contrato.id}">#{contrato.id} · {view.descricaoAutomovel(contrato.automovelId)}</option>
+                    {#else}
+                      <option value="" disabled selected>Sem contratos ativos</option>
+                    {/for}
+                  </select>
+                </label>
+                <label>
+                  Quilometragem final
+                  <input type="number" name="quilometragemFinal" min="0" value="45000" required>
+                </label>
+                <label>
+                  Avarias
+                  <textarea name="avarias" rows="3">Sem avarias aparentes.</textarea>
+                </label>
+                <button type="submit" class="btn btn-primary btn-full">Registrar devolução</button>
+              </form>
+            </section>
+          </div>
+
+          <section class="card section-spacer">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Frota</p>
+                <h2>Cadastrar veículo</h2>
+              </div>
+            </div>
+            <form method="post" action="/app/frota/cadastrar" class="form-grid four js-create-vehicle-form" enctype="multipart/form-data">
+              <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
+              <input type="hidden" name="empresaId" value="{view.empresaPrincipalId}">
+              <label>
+                Matrícula
+                <input type="text" name="matricula" placeholder="MAT-1009" required>
+              </label>
+              <label>
+                Ano
+                <input type="number" name="ano" min="1990" placeholder="2024" required>
+              </label>
+              <label>
+                Marca
+                <input type="text" name="marca" placeholder="Toyota" required>
+              </label>
+              <label>
+                Modelo
+                <input type="text" name="modelo" placeholder="Corolla" required>
+              </label>
+              <label>
+                Placa
+                <input type="text" name="placa" placeholder="ABC1D23" required>
+              </label>
+              <label>
+                Valor diária
+                <input type="number" name="valorDiaria" min="1" step="0.01" placeholder="189.90" required>
+              </label>
+              <label class="file-label">
+                Imagem do veículo
+                <input type="file" name="imagem" accept="image/png,image/jpeg,image/webp">
+                <small>Opcional · JPG, PNG ou WEBP</small>
+              </label>
+              <button type="submit" class="btn btn-primary">Cadastrar veículo</button>
+            </form>
+          </section>
+
+          <section class="card section-spacer">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Inventário</p>
+                <h2>Gerenciar frota</h2>
+              </div>
+              <span class="counter">{view.automoveis.size}</span>
+            </div>
+            <div class="fleet-list">
+              {#for automovel in view.automoveis}
+                <article class="fleet-item">
+                  <div class="fleet-main">
+                    <div class="fleet-thumb js-vehicle-image"
+                         data-vehicle-id="{automovel.id}"
+                         data-vehicle-brand="{automovel.marca}"
+                         data-vehicle-model="{automovel.modelo}">
+                      <span>{automovel.marca}</span>
+                    </div>
+                    <div>
+                      <strong>{automovel.marca} {automovel.modelo}</strong>
+                      <small>{automovel.ano} · {automovel.placa} · {view.formatarValor(automovel.valorDiaria)}/dia</small>
+                    </div>
+                  </div>
+                  <form method="post" action="/app/frota/atualizar" class="fleet-form js-auto-status-form">
+                    <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
+                    <input type="hidden" name="automovelId" value="{automovel.id}">
+                    <input type="hidden" name="matricula" value="{automovel.matricula}">
+                    <input type="hidden" name="ano" value="{automovel.ano}">
+                    <input type="hidden" name="marca" value="{automovel.marca}">
+                    <input type="hidden" name="modelo" value="{automovel.modelo}">
+                    <input type="hidden" name="placa" value="{automovel.placa}">
+                    <input type="hidden" name="valorDiaria" value="{automovel.valorDiaria}">
+                    <select name="status" aria-label="Status do veículo" title="Altere o status para salvar automaticamente">
+                      <option value="DISPONIVEL" {#if view.automovelStatusDisponivel(automovel)}selected{/if}>Disponível</option>
+                      <option value="ALUGADO" {#if view.automovelStatusAlugado(automovel)}selected{/if}>Alugado</option>
+                      <option value="MANUTENCAO" {#if view.automovelStatusManutencao(automovel)}selected{/if}>Manutenção</option>
+                    </select>
+                  </form>
+                  <form method="post" action="/app/frota/imagem" class="fleet-image-form js-auto-image-form" enctype="multipart/form-data">
+                    <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
+                    <input type="hidden" name="automovelId" value="{automovel.id}">
+                    <label class="image-upload-button" title="Escolha uma imagem para trocar automaticamente">
+                      Trocar imagem
+                      <input class="js-auto-image-input" type="file" name="imagem" accept="image/png,image/jpeg,image/webp" required>
+                    </label>
+                  </form>
                   <form method="post" action="/app/frota/remover">
                     <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
                     <input type="hidden" name="automovelId" value="{automovel.id}">
-                    <button type="submit" class="secondary">Remover</button>
+                    <button type="submit" class="btn btn-danger btn-small">Remover</button>
                   </form>
-                </td>
-              </tr>
-            {/for}
-            </tbody>
-          </table>
-        </div>
-      </article>
-    </div>
-
-    <div class="grid three">
-      <article class="card">
-        <h3>Avaliar pedido</h3>
-        <form method="post" action="/app/avaliacoes" class="form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-
-          <label for="empresaAnalise">Empresa</label>
-          <select id="empresaAnalise" name="agenteId" required>
-            {#for agente in view.empresas}
-              <option value="{agente.id}">{agente.nome}</option>
-            {/for}
-          </select>
-
-          <label for="pedidoAvaliacao">Pedido</label>
-          <select id="pedidoAvaliacao" name="pedidoId" required>
-            {#for pedido in view.pedidosParaAvaliacao}
-              <option value="{pedido.id}">Pedido {pedido.id} | {view.descricaoAutomovel(pedido.automovelId)}</option>
-            {/for}
-          </select>
-
-          <label for="parecerAvaliacao">Parecer</label>
-          <textarea id="parecerAvaliacao" name="parecer" rows="3" required>Cliente aprovado pela empresa.</textarea>
-
-          <label class="check">
-            <input type="checkbox" name="aprovado" checked>
-            <span>Aprovar</span>
-          </label>
-
-          <button type="submit">Salvar</button>
-        </form>
-      </article>
-
-      <article class="card">
-        <h3>Avaliar prorrogacao</h3>
-        <form method="post" action="/app/avaliacoes" class="form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-
-          <label for="agenteProrrogacao">Agente</label>
-          <select id="agenteProrrogacao" name="agenteId" required>
-            {#for agente in view.empresas}
-              <option value="{agente.id}">{agente.nome}</option>
-            {/for}
-          </select>
-
-          <label for="pedidoProrrogacao">Solicitacao</label>
-          <select id="pedidoProrrogacao" name="pedidoId" required>
-            {#for pedido in view.prorrogacoesPendentes}
-              <option value="{pedido.id}">Pedido {pedido.id} | contrato {pedido.contratoOrigemId} | ate {pedido.dataFim}</option>
-            {/for}
-          </select>
-
-          <label for="parecerProrrogacao">Parecer</label>
-          <textarea id="parecerProrrogacao" name="parecer" rows="3" required>Prorrogacao analisada.</textarea>
-
-          <label class="check">
-            <input type="checkbox" name="aprovado" checked>
-            <span>Aprovar</span>
-          </label>
-
-          <button type="submit">Salvar</button>
-        </form>
-      </article>
-
-      <article class="card">
-        <h3>Conceder credito</h3>
-        <form method="post" action="/app/creditos" class="form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-
-          <label for="bancoCredito">Banco</label>
-          <select id="bancoCredito" name="agenteId" required>
-            {#for agente in view.bancos}
-              <option value="{agente.id}">{agente.nome}</option>
-            {/for}
-          </select>
-
-          <label for="pedidoCredito">Pedido</label>
-          <select id="pedidoCredito" name="pedidoId" required>
-            {#for pedido in view.pedidosParaCredito}
-              <option value="{pedido.id}">Pedido {pedido.id} | {view.descricaoAutomovel(pedido.automovelId)}</option>
-            {/for}
-          </select>
-
-          <div class="grid two compact">
-            <div>
-              <label for="valorCredito">Valor</label>
-              <input id="valorCredito" type="number" name="valor" value="900.00" step="0.01" min="0.01" required>
+                </article>
+              {#else}
+                <div class="empty-state">Nenhum veículo cadastrado.</div>
+              {/for}
             </div>
-            <div>
-              <label for="jurosCredito">Juros</label>
-              <input id="jurosCredito" type="number" name="taxaJuros" value="0.10" step="0.01" min="0.01" required>
-            </div>
-          </div>
-
-          <label for="parcelasCredito">Parcelas</label>
-          <input id="parcelasCredito" type="number" name="quantidadeParcelas" value="6" min="1" required>
-
-          <button type="submit">Liberar credito</button>
-        </form>
-      </article>
+          </section>
+        </section>
+      </main>
     </div>
+  </div>
 
-    <div class="grid two">
-      <article class="card">
-        <h3>Gerar contrato</h3>
-        <form method="post" action="/app/contratos" class="form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
+  <script>
+    const body = document.body;
+    const navButtons = [...document.querySelectorAll('[data-tab-target]')];
+    const panels = [...document.querySelectorAll('[data-tab-panel]')];
 
-          <label for="pedidoContrato">Pedido</label>
-          <select id="pedidoContrato" name="pedidoId" required>
-            {#for pedido in view.pedidosParaContrato}
-              <option value="{pedido.id}">Pedido {pedido.id} | {view.descricaoAutomovel(pedido.automovelId)}</option>
-            {/for}
-          </select>
-
-          <label for="tipoContrato">Tipo</label>
-          <input id="tipoContrato" type="text" name="tipoContrato" value="ALUGUEL_MENSAL" required>
-
-          <button type="submit">Gerar contrato</button>
-        </form>
-      </article>
-
-      <article class="card">
-        <h3>Registrar devolucao</h3>
-        <form method="post" action="/app/contratos/devolucao" class="form">
-          <input type="hidden" name="clienteId" value="{view.clienteSelecionado}">
-
-          <label for="contratoDevolucao">Contrato ativo</label>
-          <select id="contratoDevolucao" name="contratoId" required>
-            {#for contrato in view.contratosAtivos}
-              <option value="{contrato.id}">Contrato {contrato.id} | {view.descricaoAutomovel(contrato.automovelId)} | cliente {contrato.clienteId}</option>
-            {/for}
-          </select>
-
-          <label for="kmFinal">Quilometragem final</label>
-          <input id="kmFinal" type="number" name="quilometragemFinal" min="1" required>
-
-          <label for="avarias">Avarias</label>
-          <textarea id="avarias" name="avarias" rows="3" placeholder="Campo opcional"></textarea>
-
-          <button type="submit">Finalizar contrato</button>
-        </form>
-      </article>
-    </div>
-  </section>
-</main>
-
-<script>
-  (() => {
-    const clienteId = document.body.dataset.clienteId;
-    const list = document.getElementById('notification-list');
-    const toastArea = document.getElementById('toast-area');
-    if (!clienteId || !list || !toastArea) {
-      return;
+    function activateTab(tabName, persist = true) {
+      navButtons.forEach((button) => button.classList.toggle('is-active', button.dataset.tabTarget === tabName));
+      panels.forEach((panel) => panel.classList.toggle('is-active', panel.dataset.tabPanel === tabName));
+      if (persist) localStorage.setItem('lh-active-tab', tabName);
+      if (history.replaceState) history.replaceState(null, '', '#' + tabName);
     }
 
-    const source = new EventSource('/api/clientes/' + clienteId + '/notificacoes/stream');
+    navButtons.forEach((button) => {
+      button.addEventListener('click', () => activateTab(button.dataset.tabTarget));
+    });
 
-    const createNotification = (notification) => {
-      const article = document.createElement('article');
-      article.className = 'notification-item fresh';
-      article.innerHTML = '<strong>' + notification.titulo + '</strong><p>' + notification.mensagem + '</p><small>' + notification.dataCriacao + '</small>';
-      list.prepend(article);
-    };
+    document.querySelectorAll('[data-tab-jump]').forEach((button) => {
+      button.addEventListener('click', () => activateTab(button.dataset.tabJump));
+    });
 
-    const createToast = (notification) => {
+    const hashTab = location.hash ? location.hash.replace('#', '') : '';
+    const savedTab = localStorage.getItem('lh-active-tab');
+    const initialTab = hashTab || savedTab || 'resumo';
+    if (panels.some((panel) => panel.dataset.tabPanel === initialTab)) activateTab(initialTab, false);
+
+    const alertBox = document.getElementById('page-alert');
+    if (alertBox) {
+      setTimeout(() => alertBox.classList.add('is-hidden'), 5500);
+    }
+
+    function normalizeVehicleAssetName(value) {
+      return String(value || '')
+        .trim()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    }
+
+    function loadFirstVehicleImage(candidates, onSuccess) {
+      let index = 0;
+
+      function tryNext() {
+        if (index >= candidates.length) return;
+        const url = candidates[index];
+        index += 1;
+
+        const image = new Image();
+        const cacheBustedUrl = url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now();
+        image.onload = () => onSuccess(cacheBustedUrl);
+        image.onerror = tryNext;
+        image.src = cacheBustedUrl;
+      }
+
+      tryNext();
+    }
+
+    function applyVehicleImages() {
+      const covers = document.querySelectorAll('.js-vehicle-image');
+
+      covers.forEach((cover) => {
+        const id = normalizeVehicleAssetName(cover.dataset.vehicleId);
+        const candidates = [];
+
+        // Endpoint unico: se nao existir imagem enviada, o Java devolve um SVG padrao.
+        // Assim o navegador nao fica tentando /app/img/veiculos/default.svg nem varias extensoes 404.
+        if (id) candidates.push('/app/uploads/veiculos/id-' + id);
+
+        loadFirstVehicleImage(candidates, (url) => {
+          cover.style.backgroundImage =
+            'linear-gradient(180deg, rgba(15, 23, 42, 0.04), rgba(15, 23, 42, 0.34)), url("' + url + '")';
+        });
+      });
+    }
+
+    applyVehicleImages();
+
+    document.querySelectorAll('.js-auto-status-form select[name="status"]').forEach((select) => {
+      select.addEventListener('change', () => {
+        const form = select.closest('form');
+        if (!form) return;
+        select.disabled = true;
+        form.submit();
+      });
+    });
+
+    document.querySelectorAll('.js-auto-image-input').forEach((input) => {
+      input.addEventListener('change', () => {
+        const form = input.closest('form');
+        if (!form || !input.files || input.files.length === 0) return;
+
+        const file = input.files[0];
+        const maxSize = 5 * 1024 * 1024;
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+        if (!allowedTypes.includes(file.type)) {
+          alert('Use uma imagem JPG, PNG ou WEBP.');
+          input.value = '';
+          return;
+        }
+
+        if (file.size > maxSize) {
+          alert('A imagem deve ter no máximo 5 MB.');
+          input.value = '';
+          return;
+        }
+
+        const uploadLabel = form.querySelector('.image-upload-button');
+        if (uploadLabel) {
+          uploadLabel.classList.add('is-loading');
+          uploadLabel.childNodes[0].textContent = 'Enviando...';
+        }
+
+        form.submit();
+      });
+    });
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[char]));
+    }
+
+    function renderNotification(notification, fresh = false) {
+      const wrapper = document.createElement('article');
+      wrapper.className = 'notification-item' + (fresh ? ' is-fresh' : '');
+
+      const dot = document.createElement('span');
+      dot.className = 'item-dot';
+
+      const content = document.createElement('div');
+      const title = document.createElement('strong');
+      const message = document.createElement('p');
+      const date = document.createElement('small');
+
+      title.textContent = notification.titulo || 'Nova notificação';
+      message.textContent = notification.mensagem || '';
+      date.textContent = notification.dataCriacao || new Date().toLocaleString('pt-BR');
+
+      content.appendChild(title);
+      content.appendChild(message);
+      content.appendChild(date);
+      wrapper.appendChild(dot);
+      wrapper.appendChild(content);
+
+      return wrapper;
+    }
+
+    function showToast(notification) {
+      const toastArea = document.getElementById('toast-area');
+      if (!toastArea) return;
+
       const toast = document.createElement('div');
       toast.className = 'toast';
-      toast.innerHTML = '<strong>' + notification.titulo + '</strong><span>' + notification.mensagem + '</span>';
-      toastArea.appendChild(toast);
-      setTimeout(() => toast.remove(), 6000);
-    };
 
-    source.onmessage = (event) => {
-      const notification = JSON.parse(event.data);
-      createNotification(notification);
-      createToast(notification);
-    };
-  })();
-</script>
->>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
+      const title = document.createElement('strong');
+      const message = document.createElement('span');
+
+      title.textContent = notification.titulo || 'Nova notificação';
+      message.textContent = notification.mensagem || '';
+
+      toast.appendChild(title);
+      toast.appendChild(message);
+      toastArea.prepend(toast);
+
+      setTimeout(() => toast.remove(), 7000);
+    }
+
+    const clienteId = body.dataset.clienteId;
+    if (clienteId && window.EventSource) {
+      try {
+        const source = new EventSource('/api/clientes/' + encodeURIComponent(clienteId) + '/notificacoes/stream');
+        source.onmessage = (event) => {
+          const notification = JSON.parse(event.data);
+          const list = document.getElementById('notification-list');
+          if (list) {
+            const empty = list.querySelector('.empty-state');
+            if (empty) empty.remove();
+            list.prepend(renderNotification(notification, true));
+          }
+          showToast(notification);
+        };
+      } catch (error) {
+        console.warn('Não foi possível iniciar o stream de notificações.', error);
+      }
+    }
+  </script>
 </body>
 </html>

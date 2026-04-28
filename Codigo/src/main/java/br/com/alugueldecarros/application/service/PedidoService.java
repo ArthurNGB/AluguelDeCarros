@@ -61,12 +61,15 @@ public class PedidoService {
 
     public PedidoAluguel atualizar(Long clienteId, Long pedidoId, PedidoDtos.AtualizarPedidoRequest request) {
         buscarCliente(clienteId);
+
         PedidoAluguel pedido = buscarPedidoDoCliente(clienteId, pedidoId);
+
         validarEdicaoPermitida(pedido);
         validarDatas(request.dataInicio(), request.dataFim());
 
         Automovel automovel = automovelRepository.findById(request.automovelId())
                 .orElseThrow(() -> new NotFoundException("Automovel nao encontrado."));
+
         if (!automovel.isDisponivel() && !automovel.getId().equals(pedido.getAutomovelId())) {
             throw new BusinessException("O automovel informado nao esta disponivel.");
         }
@@ -87,33 +90,35 @@ public class PedidoService {
 
     public PedidoAluguel cancelar(Long clienteId, Long pedidoId) {
         buscarCliente(clienteId);
+
         PedidoAluguel pedido = buscarPedidoDoCliente(clienteId, pedidoId);
 
-<<<<<<< HEAD
         if (pedido.getStatus() == StatusPedido.CONTRATADO
                 || pedido.getStatus() == StatusPedido.FINALIZADO) {
-=======
-        if (pedido.getStatus() == StatusPedido.CONTRATADO) {
->>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
             throw new BusinessException("Nao e possivel cancelar um pedido que ja gerou contrato.");
         }
 
         pedido.setStatus(StatusPedido.CANCELADO);
+
         return pedidoRepository.save(pedido);
     }
 
     public List<PedidoAluguel> listarPorCliente(Long clienteId) {
         buscarCliente(clienteId);
+
         return pedidoRepository.findByClienteId(clienteId);
     }
 
     public PedidoAluguel solicitarProrrogacao(Long clienteId, PedidoDtos.SolicitarProrrogacaoRequest request) {
         Cliente cliente = buscarCliente(clienteId);
+
         Contrato contrato = contratoRepository.findById(request.contratoId())
                 .orElseThrow(() -> new NotFoundException("Contrato nao encontrado."));
+
         if (!contrato.getClienteId().equals(cliente.getId()) || !contrato.isAtivo()) {
             throw new BusinessException("A prorrogacao so pode ser solicitada para contrato ativo do cliente.");
         }
+
         if (!request.novaDataFim().isAfter(contrato.getDataFim())) {
             throw new BusinessException("A nova data deve ser posterior ao fim atual do contrato.");
         }
@@ -131,6 +136,7 @@ public class PedidoService {
         pedido.setContratoOrigemId(contrato.getId());
         pedido.setContratoId(contrato.getId());
         pedido.setValorEstimado(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
+
         return pedidoRepository.save(pedido);
     }
 
@@ -142,22 +148,30 @@ public class PedidoService {
     private Automovel buscarAutomovelDisponivel(Long automovelId) {
         Automovel automovel = automovelRepository.findById(automovelId)
                 .orElseThrow(() -> new NotFoundException("Automovel nao encontrado."));
+
         if (!automovel.isDisponivel()) {
             throw new BusinessException("O automovel informado nao esta disponivel.");
         }
+
         return automovel;
     }
 
     private PedidoAluguel buscarPedidoDoCliente(Long clienteId, Long pedidoId) {
         PedidoAluguel pedido = pedidoRepository.findById(pedidoId)
                 .orElseThrow(() -> new NotFoundException("Pedido nao encontrado."));
+
         if (!pedido.getClienteId().equals(clienteId)) {
             throw new BusinessException("O pedido informado nao pertence ao cliente.");
         }
+
         return pedido;
     }
 
     private void validarDatas(LocalDate dataInicio, LocalDate dataFim) {
+        if (dataInicio == null || dataFim == null) {
+            throw new BusinessException("Informe as datas de inicio e fim.");
+        }
+
         if (!dataFim.isAfter(dataInicio)) {
             throw new BusinessException("A data final deve ser posterior a data inicial.");
         }
@@ -166,18 +180,15 @@ public class PedidoService {
     private void validarEdicaoPermitida(PedidoAluguel pedido) {
         if (pedido.getStatus() == StatusPedido.CANCELADO
                 || pedido.getStatus() == StatusPedido.REJEITADO
-<<<<<<< HEAD
                 || pedido.getStatus() == StatusPedido.CONTRATADO
                 || pedido.getStatus() == StatusPedido.FINALIZADO) {
-=======
-                || pedido.getStatus() == StatusPedido.CONTRATADO) {
->>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
             throw new BusinessException("O pedido nao pode mais ser alterado.");
         }
     }
 
     private BigDecimal calcularValor(Automovel automovel, LocalDate dataInicio, LocalDate dataFim) {
         long dias = Math.max(1, ChronoUnit.DAYS.between(dataInicio, dataFim));
+
         return automovel.getValorDiaria()
                 .multiply(BigDecimal.valueOf(dias))
                 .setScale(2, RoundingMode.HALF_UP);

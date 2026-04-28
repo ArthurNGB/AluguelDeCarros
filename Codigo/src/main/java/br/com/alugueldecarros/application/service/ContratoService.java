@@ -61,6 +61,7 @@ public class ContratoService {
 
         Automovel automovel = automovelRepository.findById(pedido.getAutomovelId())
                 .orElseThrow(() -> new NotFoundException("Automovel nao encontrado."));
+
         if (!automovel.isDisponivel()) {
             throw new BusinessException("O automovel nao esta mais disponivel.");
         }
@@ -79,20 +80,24 @@ public class ContratoService {
         contrato.setDataAssinatura(LocalDate.now());
         contrato.setTipo(request.tipoContrato());
         contrato.setStatus(StatusContrato.EM_CONTRATO);
+
         contratoRepository.save(contrato);
 
         if (pedido.getContratoCreditoId() != null) {
             ContratoCredito credito = contratoCreditoRepository.findById(pedido.getContratoCreditoId())
                     .orElseThrow(() -> new NotFoundException("Contrato de credito nao encontrado."));
+
             credito.setContratoId(contrato.getId());
             contratoCreditoRepository.save(credito);
         }
 
         automovel.setStatus(StatusAutomovel.ALUGADO);
         automovelRepository.save(automovel);
+
         pedido.setContratoId(contrato.getId());
         pedido.setStatus(StatusPedido.CONTRATADO);
         pedidoRepository.save(pedido);
+
         notificacaoService.notificarMudancaStatus(pedido, pedido.getStatus().name());
 
         return contrato;
@@ -101,9 +106,11 @@ public class ContratoService {
     public Contrato devolver(ContratoDtos.DevolverContratoRequest request) {
         Contrato contrato = contratoRepository.findById(request.contratoId())
                 .orElseThrow(() -> new NotFoundException("Contrato nao encontrado."));
+
         if (!contrato.isAtivo()) {
             throw new BusinessException("Apenas contratos ativos podem ser finalizados.");
         }
+
         if (request.quilometragemFinal() == null || request.quilometragemFinal() <= 0) {
             throw new BusinessException("Informe uma quilometragem final valida.");
         }
@@ -119,42 +126,48 @@ public class ContratoService {
 
         automovel.setStatus(StatusAutomovel.DISPONIVEL);
         automovelRepository.save(automovel);
-<<<<<<< HEAD
 
         PedidoAluguel pedido = pedidoRepository.findById(contrato.getPedidoId())
                 .orElseThrow(() -> new NotFoundException("Pedido nao encontrado."));
+
         pedido.setStatus(StatusPedido.FINALIZADO);
         pedidoRepository.save(pedido);
+
         notificacaoService.notificarMudancaStatus(pedido, pedido.getStatus().name());
 
-=======
->>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
         return contrato;
     }
 
     public byte[] gerarPdf(Long contratoId) {
         Contrato contrato = contratoRepository.findById(contratoId)
                 .orElseThrow(() -> new NotFoundException("Contrato nao encontrado."));
+
         if (!contrato.isAtivo()) {
             throw new BusinessException("O PDF so pode ser gerado para contratos em andamento.");
         }
 
         PedidoAluguel pedido = pedidoRepository.findById(contrato.getPedidoId())
                 .orElseThrow(() -> new NotFoundException("Pedido nao encontrado."));
+
         Cliente cliente = usuarioRepository.findClienteById(contrato.getClienteId())
                 .orElseThrow(() -> new NotFoundException("Cliente nao encontrado."));
+
         Automovel automovel = automovelRepository.findById(contrato.getAutomovelId())
                 .orElseThrow(() -> new NotFoundException("Automovel nao encontrado."));
+
         Agente empresa = usuarioRepository.findAgenteById(automovel.getProprietarioId())
                 .orElseThrow(() -> new NotFoundException("Agente da empresa nao encontrado."));
+
         Agente agenteResponsavel = pedido.getAgenteResponsavelId() == null
                 ? empresa
                 : usuarioRepository.findAgenteById(pedido.getAgenteResponsavelId()).orElse(empresa);
 
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
             Document document = new Document();
             PdfWriter.getInstance(document, outputStream);
+
             document.open();
 
             Font titulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
@@ -163,6 +176,7 @@ public class ContratoService {
 
             document.add(new Paragraph("Contrato de Locacao de Veiculo", titulo));
             document.add(new Paragraph(" "));
+
             document.add(new Paragraph("Dados do cliente", subtitulo));
             document.add(new Paragraph("Nome: " + cliente.getNome(), corpo));
             document.add(new Paragraph("CPF: " + cliente.getCpf(), corpo));
@@ -190,12 +204,14 @@ public class ContratoService {
                             "O cliente assume a responsabilidade pela guarda, uso regular e devolucao nas condicoes acordadas.",
                     corpo
             ));
+
             document.add(new Paragraph(
                     "Este documento foi emitido automaticamente pelo sistema para fins de registro do aluguel.",
                     corpo
             ));
 
             document.close();
+
             return outputStream.toByteArray();
         } catch (DocumentException exception) {
             throw new BusinessException("Nao foi possivel gerar o PDF do contrato.");

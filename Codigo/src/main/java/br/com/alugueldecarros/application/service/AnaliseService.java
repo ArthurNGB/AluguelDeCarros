@@ -8,10 +8,10 @@ import br.com.alugueldecarros.domain.model.Contrato;
 import br.com.alugueldecarros.domain.model.ContratoCredito;
 import br.com.alugueldecarros.domain.model.PedidoAluguel;
 import br.com.alugueldecarros.domain.model.StatusPedido;
-import br.com.alugueldecarros.domain.model.TipoPedido;
 import br.com.alugueldecarros.domain.model.TipoAgente;
-import br.com.alugueldecarros.domain.repository.ContratoRepository;
+import br.com.alugueldecarros.domain.model.TipoPedido;
 import br.com.alugueldecarros.domain.repository.ContratoCreditoRepository;
+import br.com.alugueldecarros.domain.repository.ContratoRepository;
 import br.com.alugueldecarros.domain.repository.PedidoAluguelRepository;
 import br.com.alugueldecarros.domain.repository.UsuarioRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -45,13 +45,9 @@ public class AnaliseService {
         PedidoAluguel pedido = pedidoRepository.findById(request.pedidoId())
                 .orElseThrow(() -> new NotFoundException("Pedido nao encontrado."));
 
-<<<<<<< HEAD
         if (pedido.getStatus() == StatusPedido.CANCELADO
                 || pedido.getStatus() == StatusPedido.CONTRATADO
                 || pedido.getStatus() == StatusPedido.FINALIZADO) {
-=======
-        if (pedido.getStatus() == StatusPedido.CANCELADO || pedido.getStatus() == StatusPedido.CONTRATADO) {
->>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
             throw new BusinessException("Nao e possivel avaliar este pedido.");
         }
 
@@ -61,6 +57,7 @@ public class AnaliseService {
 
         pedido.setAgenteResponsavelId(agente.getId());
         pedido.setParecerAgente(request.parecer());
+
         if (pedido.getTipoPedido() == TipoPedido.PRORROGACAO) {
             processarProrrogacao(pedido, request.aprovado());
         } else {
@@ -76,6 +73,7 @@ public class AnaliseService {
 
     public ContratoCredito concederCredito(Long agenteId, AnaliseDtos.ConcederCreditoRequest request) {
         Agente agente = buscarAgente(agenteId);
+
         if (agente.getTipo() != TipoAgente.BANCO) {
             throw new BusinessException("Somente agentes do tipo BANCO podem conceder credito.");
         }
@@ -86,9 +84,11 @@ public class AnaliseService {
         if (!pedido.isRequerCredito()) {
             throw new BusinessException("O pedido informado nao requer credito.");
         }
+
         if (pedido.getStatus() != StatusPedido.AGUARDANDO_CREDITO) {
             throw new BusinessException("O pedido precisa estar aguardando credito para esta operacao.");
         }
+
         contratoCreditoRepository.findByPedidoId(pedido.getId())
                 .ifPresent(credito -> {
                     throw new BusinessException("Ja existe credito concedido para este pedido.");
@@ -106,9 +106,11 @@ public class AnaliseService {
         ));
 
         contratoCreditoRepository.save(contratoCredito);
+
         pedido.setContratoCreditoId(contratoCredito.getId());
         pedido.setStatus(StatusPedido.CREDITO_APROVADO);
         pedidoRepository.save(pedido);
+
         notificacaoService.notificarMudancaStatus(pedido, pedido.getStatus().name());
 
         return contratoCredito;
@@ -116,24 +118,28 @@ public class AnaliseService {
 
     public AnaliseDtos.ResumoMensalResponse resumoMensalAtual() {
         LocalDate hoje = LocalDate.now();
+
         long pendentes = pedidoRepository.listAll().stream()
                 .filter(pedido -> pedido.getDataCriacao() != null)
                 .filter(pedido -> pedido.getDataCriacao().getMonth() == hoje.getMonth()
                         && pedido.getDataCriacao().getYear() == hoje.getYear())
                 .filter(pedido -> statusPendente(pedido.getStatus()))
                 .count();
+
         long aprovados = pedidoRepository.listAll().stream()
                 .filter(pedido -> pedido.getDataCriacao() != null)
                 .filter(pedido -> pedido.getDataCriacao().getMonth() == hoje.getMonth()
                         && pedido.getDataCriacao().getYear() == hoje.getYear())
                 .filter(pedido -> statusAprovado(pedido.getStatus()))
                 .count();
+
         long rejeitados = pedidoRepository.listAll().stream()
                 .filter(pedido -> pedido.getDataCriacao() != null)
                 .filter(pedido -> pedido.getDataCriacao().getMonth() == hoje.getMonth()
                         && pedido.getDataCriacao().getYear() == hoje.getYear())
                 .filter(pedido -> statusRejeitado(pedido.getStatus()))
                 .count();
+
         return new AnaliseDtos.ResumoMensalResponse(pendentes, aprovados, rejeitados);
     }
 
@@ -151,8 +157,10 @@ public class AnaliseService {
         if (aprovado) {
             Contrato contrato = contratoRepository.findById(pedido.getContratoOrigemId())
                     .orElseThrow(() -> new NotFoundException("Contrato nao encontrado para a prorrogacao."));
+
             contrato.setDataFim(pedido.getDataFim());
             contratoRepository.save(contrato);
+
             pedido.setStatus(StatusPedido.PRORROGACAO_APROVADA);
         } else {
             pedido.setStatus(StatusPedido.PRORROGACAO_REJEITADA);
@@ -169,10 +177,7 @@ public class AnaliseService {
         return statusPedido == StatusPedido.APROVADO
                 || statusPedido == StatusPedido.CREDITO_APROVADO
                 || statusPedido == StatusPedido.CONTRATADO
-<<<<<<< HEAD
                 || statusPedido == StatusPedido.FINALIZADO
-=======
->>>>>>> d798b9dba2bddcc36cbb13e793e8f279a2b1221e
                 || statusPedido == StatusPedido.PRORROGACAO_APROVADA;
     }
 
