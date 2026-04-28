@@ -12,7 +12,7 @@ Este diretório mantém os artefatos do projeto.
 
 ## [DiagramaDeComponentes](../Artefatos/DiagramaDeComponentes/)
 
-- [template](../Artefatos/DiagramaDeComponentes/XXXXX.pdf)
+- [Diagrama de Componentes](../Artefatos/DiagramaDeComponentes/DiagramaDeComponentes.jpeg)
 
 ## [DiagramaDePacotes](../Artefatos/DiagramaDePacotes/)
 
@@ -21,3 +21,7 @@ Este diretório mantém os artefatos do projeto.
 ## [HistoriaDeUsuario](../Artefatos/HistoriaDeUsuario/)
 
 - [Historia do Usuario-1](../Artefatos/HistoriaDeUsuario/HistoriaDeUsuario-2.pdf)
+  
+## [DiagramaDeImplantação](../Artefatos/DiagramaDeImplantação/)
+
+- [Diagrama de Implantação](../Artefatos/DiagramaDeImplantação/DiagramaDeImplantação.jpeg)
